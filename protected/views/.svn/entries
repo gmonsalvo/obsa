@@ -1,0 +1,163 @@
+10
+
+dir
+930
+svn+ssh://mestrada@186.153.11.158/var/subversion/capadv/protected/views
+svn+ssh://mestrada@186.153.11.158/var/subversion
+
+
+
+2013-04-30T17:58:55.862777Z
+927
+gmonsalvo
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+26c1ea7e-4559-4443-a927-a4a1d2ec9df7
+
+tmpCheques
+dir
+
+formaPagoOrdenProveedores
+dir
+
+recibosDetalle
+dir
+
+pesificaciones
+dir
+
+ordenesPagoProveedores
+dir
+
+recibosOrdenPago
+dir
+
+monedas
+dir
+
+detalleColocaciones
+dir
+
+proveedores
+dir
+
+ordenIngreso
+dir
+
+socios
+dir
+
+layouts
+dir
+
+localidades
+dir
+
+clientes
+dir
+
+ordenesPago
+dir
+
+ordenesCambio
+dir
+
+provincias
+dir
+
+user
+dir
+
+detallePesificaciones
+dir
+
+pesificadores
+dir
+
+actividades
+dir
+
+apoderados
+dir
+
+ctacteProveedores
+dir
+
+productos
+dir
+
+operacionesCambio
+dir
+
+controller
+dir
+
+operacionesCheques
+dir
+
+libradores
+dir
+
+flujoFondos
+dir
+
+sucursales
+dir
+
+ctacteClientes
+dir
+
+comisionesOperadores
+dir
+
+conceptos
+dir
+
+cheques
+dir
+
+presupuestosCheques
+dir
+
+colocaciones
+dir
+
+beneficiarios
+dir
+
+conceptosPesificaciones
+dir
+
+cuentas
+dir
+
+operadores
+dir
+
+formaPagoOrden
+dir
+
+presupuestoOperacionesCheques
+dir
+
+site
+dir
+
+bancos
+dir
+
+perfiles
+dir
+

@@ -1,0 +1,358 @@
+<?php
+
+class PresupuestoOperacionesChequesController extends Controller {
+
+    /**
+     * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
+     * using two-column layout. See 'protected/views/layouts/column2.php'.
+     */
+    public $layout = '//layouts/column2';
+
+    /**
+     * @return array action filters
+     */
+    public function filters() {
+        return array(
+            'accessControl', // perform access control for CRUD operations
+        );
+    }
+
+    /**
+     * Specifies the access control rules.
+     * This method is used by the 'accessControl' filter.
+     * @return array access control rules
+     */
+    public function accessRules() {
+        return array(
+            array('allow', // allow all users to perform 'index' and 'view' actions
+                'actions' => array('index', 'view'),
+                'users' => array('*'),
+            ),
+            array('allow', // allow authenticated user to perform 'create' and 'update' actions
+                'actions' => array('create', 'update', 'nuevaOperacion', 'resumenPDF', 'presupuesto', 'admin', 'getDetallePresupuesto', 'crearOperacion'),
+                'users' => array('@'),
+            ),
+            array('allow', // allow admin user to perform 'admin' and 'delete' actions
+                'actions' => array('admin', 'delete'),
+                'users' => array('admin'),
+            ),
+            array('deny', // deny all users
+                'users' => array('*'),
+            ),
+        );
+    }
+
+    /**
+     * Displays a particular model.
+     * @param integer $id the ID of the model to be displayed
+     */
+    public function actionView($id) {
+        $this->render('view', array(
+            'model' => $this->loadModel($id),
+        ));
+    }
+
+    /**
+     * Creates a new model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     */
+    public function actionCreate() {
+        $model = new PresupuestoOperacionesCheques;
+
+        // Uncomment the following line if AJAX validation is needed
+        // $this->performAjaxValidation($model);
+
+        if (isset($_POST['PresupuestoOperacionesCheques'])) {
+            $model->attributes = $_POST['PresupuestoOperacionesCheques'];
+            if ($model->save())
+                $this->redirect(array('view', 'id' => $model->id));
+        }
+
+        $this->render('create', array(
+            'model' => $model,
+        ));
+    }
+
+    /**
+     * Updates a particular model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param integer $id the ID of the model to be updated
+     */
+    public function actionUpdate($id) {
+        $model = $this->loadModel($id);
+
+        // Uncomment the following line if AJAX validation is needed
+        // $this->performAjaxValidation($model);
+
+        if (isset($_POST['PresupuestoOperacionesCheques'])) {
+            $model->attributes = $_POST['PresupuestoOperacionesCheques'];
+            if ($model->save())
+                $this->redirect(array('view', 'id' => $model->id));
+        }
+
+        $this->render('update', array(
+            'model' => $model,
+        ));
+    }
+
+    /**
+     * Deletes a particular model.
+     * If deletion is successful, the browser will be redirected to the 'admin' page.
+     * @param integer $id the ID of the model to be deleted
+     */
+    public function actionDelete($id) {
+        if (Yii::app()->request->isPostRequest) {
+            // we only allow deletion via POST request
+            $this->loadModel($id)->delete();
+
+            // if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
+            if (!isset($_GET['ajax']))
+                $this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
+        }
+        else
+            throw new CHttpException(400, 'Invalid request. Please do not repeat this request again.');
+    }
+
+    /**
+     * Lists all models.
+     */
+    public function actionIndex() {
+        $dataProvider = new CActiveDataProvider('PresupuestoOperacionesCheques');
+        $this->render('index', array(
+            'dataProvider' => $dataProvider,
+        ));
+    }
+
+    /**
+     * Manages all models.
+     */
+    public function actionAdmin() {
+        $model = new PresupuestoOperacionesCheques('search');
+        $model->unsetAttributes();  // clear any default values
+        if (isset($_GET['PresupuestoOperacionesCheques']))
+            $model->attributes = $_GET['PresupuestoOperacionesCheques'];
+
+        $this->render('admin', array(
+            'model' => $model,
+        ));
+    }
+
+    /**
+     * Returns the data model based on the primary key given in the GET variable.
+     * If the data model is not found, an HTTP exception will be raised.
+     * @param integer the ID of the model to be loaded
+     */
+    public function loadModel($id) {
+        $model = PresupuestoOperacionesCheques::model()->findByPk($id);
+        if ($model === null)
+            throw new CHttpException(404, 'The requested page does not exist.');
+        return $model;
+    }
+
+    /**
+     * Performs the AJAX validation.
+     * @param CModel the model to be validated
+     */
+    protected function performAjaxValidation($model) {
+        if (isset($_POST['ajax']) && $_POST['ajax'] === 'presupuesto-operaciones-cheques-form') {
+            echo CActiveForm::validate($model);
+            Yii::app()->end();
+        }
+    }
+
+    public function actionNuevaOperacion() {
+        $model = new PresupuestoOperacionesCheques;
+        $model->init();
+        $presupuestosCheque = new PresupuestosCheques;
+        // Uncomment the following line if AJAX validation is needed
+        // $this->performAjaxValidation($model);
+        if (isset($_POST['PresupuestoOperacionesCheques'])) {
+            $model->attributes = $_POST['PresupuestoOperacionesCheques'];
+            $model->estado = PresupuestoOperacionesCheques::ESTADO_COMPRADO;
+            $model->montoNetoTotal = Utilities::Unformat($model->montoNetoTotal);
+            $model->fecha = Utilities::MysqlDateFormat($model->fecha);
+            $connection = Yii::app()->db;
+            $command = Yii::app()->db->createCommand();
+
+            $presupuestosCheques = PresupuestosCheques::model()->findChequesDelDia();
+            //$tmpcheques = $command->select('*')->from('tmpCheques')->where('DATE(timeStamp)=:fechahoy AND userStamp=:username AND presupuesto=1', array(':fechahoy' => Date('Y-m-d'), ':username' => Yii::app()->user->model->username))->queryAll();
+            $transaction = $connection->beginTransaction();
+            try {
+                if ($model->save() && count($presupuestosCheques) > 0) {
+                    $presupuestoOperacionesChequesId = $model->id;
+                    foreach ($presupuestosCheques as $presupuestosCheque) {
+                        $presupuestosCheque->operacionChequeId = $presupuestoOperacionesChequesId;
+                        if (!$presupuestosCheque->save(false, array("operacionChequeId")))
+                            $errores = $presupuestosCheque->getErrors();
+                    }
+                    $transaction->commit();
+                    Yii::app()->user->setFlash('success', 'Presupuesto guardado con exito');
+                    $this->redirect(array('admin'));
+                } else {
+                    if (count($presupuestosCheques) == 0) {
+                        $presupuestosCheque->addError('error', 'Debe ingresar al menos un cheque para guardar el presupuesto');
+                        $transaction->rollBack();
+                    }
+                }
+            } catch (Exception $e) { // an exception is raised if a query fails
+                $transaction->rollBack();
+                Yii::app()->user->setFlash('error', $e->getMessage());
+            }
+        }
+
+        $this->render('crear', array(
+            'model' => $model, 'presupuestosCheque' => $presupuestosCheque
+        ));
+    }
+
+    public function actionResumenPDF() {
+
+        $presupuestoscheques = PresupuestosCheques::model()->findChequesDelDia();
+        if (count($presupuestoscheques) > 0) {
+
+            $pdf = Yii::createComponent('application.extensions.tcpdf.ETcPdf', 'P', 'cm', 'A4', true, 'UTF-8');
+            $pdf->SetCreator(PDF_CREATOR);
+            $pdf->SetAuthor("CAPITAL ADVISORS");
+            $pdf->SetTitle("Resumen de la Operatoria");
+            $pdf->SetKeywords("TCPDF, PDF, example, test, guide");
+            $pdf->setPrintHeader(false);
+            $pdf->setPrintFooter(false);
+            $pdf->AliasNbPages();
+            $pdf->AddPage();
+            $pdf->SetFont("times", "B", 12);
+            $pdf->Write(0, Date("d/m/Y"), '', 0, 'R', true, 0, false, false, 0);
+            $pdf->Cell(0, 3, 'Detalles de la Operatoria', 0, 1, 'C');
+
+            $html = '
+			<table border="1">
+				<thead>
+				<tr>
+				<td>ESP.</td><td>BANCO</td><td>NRO.</td><td>VTO.</td><td>DIAS AL VENC.</td><td>LIBRADOR</td><td>ENDOSANTE</td><td>IMPORTE</td>
+			</tr>
+			</thead>';
+
+            foreach ($presupuestoscheques as $cheque) {
+                $diasAlVencimiento=Utilities::RestarFechas(Date("d-m-Y"),$cheque->fechaPago)+$cheque->clearing;
+                $html.="<tbody><tr>
+					<td>CH. PD.</td><td>" . $cheque->banco->nombre . "</td><td>" . $cheque->numeroCheque . "</td><td>" . $cheque->fechaPago . "</td><td>".$diasAlVencimiento."</td><td>" . $cheque->librador->denominacion . "</td><td>" . $cheque->endosante . "</td><td>" . Utilities::MoneyFormat($cheque->montoOrigen) . "</td>
+					</tr>";
+            }
+            $presupuestoOperacionesCheques = new PresupuestoOperacionesCheques();
+            $presupuestoOperacionesCheques->init();
+            $montoNetoTotal = $presupuestoOperacionesCheques->montoNetoTotal;
+            $html.='</tbody></table>';
+            $html.='<br>';
+            $html.='Descuento total: ' . Utilities::MoneyFormat($presupuestoOperacionesCheques->montoIntereses) . '<br/><br/>';
+            $html.='Gastos de pesificacion: ' . Utilities::MoneyFormat($presupuestoOperacionesCheques->montoPesificacion) . '<br/><br/>';
+            $html.='TOTAL: ' . Utilities::MoneyFormat($montoNetoTotal) . ' (PESOS: ' . Utilities::num2letras($montoNetoTotal) . ')';
+            $pdf->writeHTML($html, true, false, true, false, '');
+            $pdf->Output($cheque->id . ".pdf", "I");
+        } else {
+            echo "<script>alert('No hay ningun cheque ingresado')</script>";
+        }
+    }
+
+    public function actionPresupuesto() {
+        echo '<script type="text/javascript" language="javascript">
+		window.open("ResumenPDF");
+		</script>';
+    }
+
+    public function actionGetDetallePresupuesto() {
+        if (isset($_POST['presupuestoOperacionesChequesId'])) {
+            $model = $this->loadModel($_POST['presupuestoOperacionesChequesId']);
+            $dataProvider = $model->searchById();
+            echo $this->renderPartial('/presupuestosCheques/verDetalles', array('dataProvider' => $dataProvider), true);
+        }
+    }
+
+    public function actionCrearOperacion() {
+        if (isset($_POST["id"]) && isset($_POST["botonSubmit"])) {
+            if ($_POST["botonSubmit"] == "Crear Operacion") {
+                $model = $this->loadModel($_POST["id"]);
+                $operacionesCheques = new OperacionesCheques();
+                $operacionesCheques->operadorId = $model->operadorId;
+                $operacionesCheques->clienteId = $model->clienteId;
+                $operacionesCheques->montoNetoTotal = $model->montoNetoTotal;
+                $operacionesCheques->fecha = $model->fecha;
+                $connection = Yii::app()->db;
+
+                $transaction = $connection->beginTransaction();
+                try {
+                    if ($operacionesCheques->save(true, null)) {
+                        $operacionChequeId = $operacionesCheques->id;
+                        $presupuestosCheques = PresupuestosCheques::model()->findAll("operacionChequeId=:operacionChequeId", array(":operacionChequeId" => $model->id));
+                        $montoNetoTotal=0;
+                        foreach ($presupuestosCheques as $presupuestosCheque) {
+                            $cheque = new Cheques();
+                            $cheque->operacionChequeId = $operacionChequeId;
+                            $cheque->tasaDescuento = $presupuestosCheque->tasaDescuento;
+                            $cheque->clearing = $presupuestosCheque->clearing;
+                            $cheque->pesificacion = $presupuestosCheque->pesificacion;
+                            $cheque->numeroCheque = $presupuestosCheque->numeroCheque;
+                            $cheque->libradorId = $presupuestosCheque->libradorId;
+                            $cheque->bancoId = $presupuestosCheque->bancoId;
+                            $cheque->montoOrigen = $presupuestosCheque->montoOrigen;
+                            $cheque->fechaPago = Utilities::MysqlDateFormat($presupuestosCheque->fechaPago);
+                            $cheque->tipoCheque = $presupuestosCheque->tipoCheque;
+                            $cheque->endosante = $presupuestosCheque->endosante;
+                            //$cheque->montoNeto = $presupuestosCheque->montoNeto;
+                            $cheque->montoNeto =  $presupuestosCheque->calcularMontoNeto($presupuestosCheque->montoOrigen, $presupuestosCheque->fechaPago, $presupuestosCheque->tasaDescuento, $presupuestosCheque->clearing, $presupuestosCheque->pesificacion, date("d-m-Y"));
+                            $cheque->estado = $presupuestosCheque->estado;
+                            $cheque->tieneNota = $presupuestosCheque->tieneNota;
+                            $cheque->montoGastos = $presupuestosCheque->montoGastos;
+                            $cheque->comisionado = $presupuestosCheque->comisionado;
+                            $montoNetoTotal+=$cheque->montoNeto;
+                            if (!$cheque->save(true, null)) {
+                                Yii::app()->user->setFlash('error', 'Error en la operacion');
+                                $transaction->rollBack();
+                                break;
+                            }
+                            $presupuestosCheque->delete();
+                        }
+                        $operacionesCheques->montoNetoTotal=$montoNetoTotal;
+                        $operacionesCheques->save();
+                        $model->delete();
+
+                        // hacemos el credito del monto de la operacion en la ctacte del cliente
+                        $ctacteCliente = new CtacteClientes();
+                        $ctacteCliente->tipoMov = CtacteClientes::TYPE_CREDITO;
+                        $ctacteCliente->conceptoId = 12;
+                        $ctacteCliente->clienteId = $model->clienteId;
+                        $ctacteCliente->productoId = 1;
+                        $ctacteCliente->descripcion = "Credito por la compra de cheques";
+
+                        $ctacteCliente->monto = $model->montoNetoTotal;
+                        $ctacteCliente->saldoAcumulado=$ctacteCliente->getSaldoAcumuladoActual()+$ctacteCliente->monto;
+                        $ctacteCliente->fecha = date("Y-m-d");
+                        $ctacteCliente->origen = "OperacionesCheques";
+                        $ctacteCliente->identificadorOrigen = $model->id;
+
+                        if(!$ctacteCliente->save()){
+                            throw new Exception("Error al efectuar movimiento en ctacte del cliente", 1);                        
+                        }
+                        $transaction->commit();
+                        Yii::app()->user->setFlash('success', 'La operacion fue creada con exito');
+                        $this->redirect(array('operacionesCheques/view', 'id' => $operacionChequeId));
+                        //$this->redirect(array('admin'));
+                    } else {
+                        Yii::app()->user->setFlash('error', 'Error en la operacion');
+                        $transaction->rollBack();
+                    }
+                } catch (Exception $e) {
+                    Yii::app()->user->setFlash('error', 'Error en la operacion');
+                    $transaction->rollBack();
+                }
+            } else {
+                if ($_POST["botonSubmit"] == "Cancelar Presupuesto") {
+                    $model = $this->loadModel($_POST["id"]);
+                    PresupuestosCheques::model()->deleteAll("operacionChequeId=:operacionChequeId", array(":operacionChequeId" => $model->id));
+                    $model->delete();
+                    Yii::app()->user->setFlash('success', 'Operacion realizada con exito');
+                    $this->actionAdmin();
+                }
+            }
+        }
+    }
+
+}

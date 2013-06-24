@@ -1,0 +1,125 @@
+<?php
+
+/**
+ * This is the model class for table "comisionesOperadores".
+ *
+ * The followings are the available columns in table 'comisionesOperadores':
+ * @property integer $id
+ * @property integer $detalleColocacionId
+ * @property integer $operadorId
+ * @property string $porcentaje
+ * @property string $monto
+ * @property integer $estado
+ * @property string $userStamp
+ * @property string $timeStamp
+ */
+class ComisionesOperadores extends CActiveRecord
+{
+
+	const ESTADO_PENDIENTE = 0;
+	const ESTADO_ACREDITADO = 1;
+
+	/**
+	 * Returns the static model of the specified AR class.
+	 * @return ComisionesOperadores the static model class
+	 */
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+
+	/**
+	 * @return string the associated database table name
+	 */
+	public function tableName()
+	{
+		return 'comisionesOperadores';
+	}
+
+	/**
+	 * @return array validation rules for model attributes.
+	 */
+	public function rules()
+	{
+		// NOTE: you should only define rules for those attributes that
+		// will receive user inputs.
+		return array(
+			array('detalleColocacionId, operadorId, porcentaje, monto, userStamp, timeStamp', 'required'),
+			array('detalleColocacionId, operadorId, estado', 'numerical', 'integerOnly'=>true),
+			array('porcentaje', 'length', 'max'=>5),
+			array('monto', 'length', 'max'=>15),
+			array('userStamp', 'length', 'max'=>50),
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+			array('id, detalleColocacionId, operadorId, porcentaje, monto, estado, userStamp, timeStamp', 'safe', 'on'=>'search'),
+		);
+	}
+
+	/**
+	 * @return array relational rules.
+	 */
+	public function relations()
+	{
+		// NOTE: you may need to adjust the relation name and the related
+		// class name for the relations automatically generated below.
+        return array(
+            'detalleColocacion' => array(self::BELONGS_TO, 'DetalleColocaciones', 'detalleColocacionId'),
+        );
+	}
+
+	/**
+	 * @return array customized attribute labels (name=>label)
+	 */
+	public function attributeLabels()
+	{
+		return array(
+			'id' => 'ID',
+			'detalleColocacionId' => 'Detalle Colocacion',
+			'operadorId' => 'Operador',
+			'porcentaje' => 'Porcentaje',
+			'monto' => 'Monto',
+			'estado' => 'Estado',
+			'userStamp' => 'User Stamp',
+			'timeStamp' => 'Time Stamp',
+		);
+	}
+
+	/**
+	 * Retrieves a list of models based on the current search/filter conditions.
+	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
+	 */
+	public function search()
+	{
+		// Warning: Please modify the following code to remove attributes that
+		// should not be searched.
+
+		$criteria=new CDbCriteria;
+
+		$criteria->compare('id',$this->id);
+		$criteria->compare('detalleColocacionId',$this->detalleColocacionId);
+		$criteria->compare('operadorId',$this->operadorId);
+		$criteria->compare('porcentaje',$this->porcentaje,true);
+		$criteria->compare('monto',$this->monto,true);
+		$criteria->compare('estado',$this->estado);
+		$criteria->compare('userStamp',$this->userStamp,true);
+		$criteria->compare('timeStamp',$this->timeStamp,true);
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+		));
+	}
+
+	protected function beforeValidate() {
+        $this->userStamp = Yii::app()->user->model->username;
+        $this->timeStamp = Date("Y-m-d h:m:s");
+        return parent::beforeValidate();
+    }
+
+    public function getEstadoDescripcion($estado) {
+        $array = array(
+                    self::ESTADO_PENDIENTE => 'Pendiente',
+                    self::ESTADO_ACREDITADO => 'Acreditado',
+                );
+        return $array[$estado];
+    }
+}
