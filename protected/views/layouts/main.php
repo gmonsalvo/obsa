@@ -47,6 +47,7 @@
                                     array('label' => 'Provincias', 'url' => array('/provincias/admin')),
                                     array('label' => 'Cuentas', 'url' => array('/cuentas/admin')),
                                     array('label' => 'Conceptos', 'url' => array('/conceptos/admin')),
+                                    array('label' => 'Financieras', 'url' => array('/financieras/admin')),
                                 ),
                             ),
                             array('label' => 'Clientes', 'url' => array(''),
