@@ -1,32 +1,27 @@
 <?php
 
 /**
- * This is the model class for table "financieras".
+ * This is the model class for table "responsables".
  *
- * The followings are the available columns in table 'financieras':
+ * The followings are the available columns in table 'responsables':
  * @property string $id
  * @property string $nombre
- * @property string $direccion
- * @property string $telefono
- * @property string $tasaPromedio
- * @property integer $diasClearing
- * @property string $tasaPesificacion
+ * @property string $email
+ * @property string $celular
+ * @property string $fijo
  * @property string $userStamp
  * @property string $timeStamp
  *
  * The followings are the available model relations:
  * @property ResponsablesFinancieras[] $responsablesFinancierases
  */
-class Financieras extends CActiveRecord
+class Responsables extends CActiveRecord
 {
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
-	 * @return Financieras the static model class
+	 * @return Responsables the static model class
 	 */
-	
-	public $errorResponsables;
-	
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
@@ -37,7 +32,7 @@ class Financieras extends CActiveRecord
 	 */
 	public function tableName()
 	{
-		return 'financieras';
+		return 'responsables';
 	}
 
 	/**
@@ -48,16 +43,12 @@ class Financieras extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('nombre, direccion, userStamp, timeStamp', 'required'),
-			array('diasClearing', 'numerical', 'integerOnly'=>true),
-			array('nombre', 'length', 'max'=>100),
-			array('direccion, telefono, userStamp', 'length', 'max'=>45),
-			array('tasaPromedio, tasaPesificacion', 'length', 'max'=>5),
-			array('tasaPromedio, tasaPesificacion', 'numerical', 'integerOnly'=>false),
-			array('tasaPromedio, tasaPesificacion', 'numerical', 'integerOnly'=>false),
+			array('nombre, email, celular, userStamp, timeStamp', 'required'),
+			array('nombre, email, celular, fijo, userStamp', 'length', 'max'=>45),
+			array('email', 'email'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, nombre, direccion, telefono, tasaPromedio, diasClearing, tasaPesificacion, userStamp, timeStamp', 'safe', 'on'=>'search'),
+			array('id, nombre, email, celular, fijo, userStamp, timeStamp', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -69,7 +60,7 @@ class Financieras extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'responsables' => array(self::MANY_MANY, 'Responsables', 'responsablesFinancieras(financieraId,responsableId)'),
+			'responsablesFinancierases' => array(self::HAS_MANY, 'ResponsablesFinancieras', 'responsableId'),
 		);
 	}
 
@@ -81,11 +72,9 @@ class Financieras extends CActiveRecord
 		return array(
 			'id' => 'ID',
 			'nombre' => 'Nombre',
-			'direccion' => 'Direccion',
-			'telefono' => 'Telefono',
-			'tasaPromedio' => 'Tasa Promedio',
-			'diasClearing' => 'Dias Clearing',
-			'tasaPesificacion' => 'Tasa Pesificacion',
+			'email' => 'Email',
+			'celular' => 'Celular',
+			'fijo' => 'Fijo',
 			'userStamp' => 'User Stamp',
 			'timeStamp' => 'Time Stamp',
 		);
@@ -104,11 +93,9 @@ class Financieras extends CActiveRecord
 
 		$criteria->compare('id',$this->id,true);
 		$criteria->compare('nombre',$this->nombre,true);
-		$criteria->compare('direccion',$this->direccion,true);
-		$criteria->compare('telefono',$this->telefono,true);
-		$criteria->compare('tasaPromedio',$this->tasaPromedio,true);
-		$criteria->compare('diasClearing',$this->diasClearing);
-		$criteria->compare('tasaPesificacion',$this->tasaPesificacion,true);
+		$criteria->compare('email',$this->email,true);
+		$criteria->compare('celular',$this->celular,true);
+		$criteria->compare('fijo',$this->fijo,true);
 		$criteria->compare('userStamp',$this->userStamp,true);
 		$criteria->compare('timeStamp',$this->timeStamp,true);
 
@@ -117,11 +104,10 @@ class Financieras extends CActiveRecord
 		));
 	}
 	
-	public function behaviors()
+	public function behaviors() 
 	{
     	return array(
         	'LoggableBehavior' => 'application.modules.auditTrail.behaviors.LoggableBehavior',
-            'activerecord-relation'=>array('class'=>'ext.yiiext.behaviors.activerecord-relation.EActiveRecordRelationBehavior',),
     	);
 	}	
 	
@@ -131,5 +117,14 @@ class Financieras extends CActiveRecord
         $this->timeStamp = Date("Y-m-d h:m:s");
 		
 		return parent::beforeValidate();
+	}
+	
+	public function responsablesDisponibles($ids)
+	{
+		$criteria = new CDbCriteria;
+
+		$criteria->addNotInCondition('id',$ids);
+		
+		return new CActiveDataProvider($this, array('criteria'=>$criteria,));
 	}
 }

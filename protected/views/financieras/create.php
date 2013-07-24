@@ -5,7 +5,7 @@ $this->breadcrumbs=array(
 );
 
 $this->menu=array(
-	//array('label'=>'Listar Financieras', 'url'=>array('index')),
+	array('label'=>'Listar Financieras', 'url'=>array('index')),
 	array('label'=>'Administrar Financieras', 'url'=>array('admin')),
 );
 ?>

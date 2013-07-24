@@ -1,6 +1,6 @@
 <?php
 
-class FinancierasController extends Controller
+class ResponsablesController extends Controller
 {
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
@@ -61,25 +61,14 @@ class FinancierasController extends Controller
 	 */
 	public function actionCreate()
 	{
-		$model=new Financieras;
+		$model=new Responsables;
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
-				
-		if(isset($_POST['Financieras'])) {
-			$model->attributes=$_POST['Financieras'];
-			
-			$data=array();
-			
-			if (isset($_POST['select_right'])) {
-	        	$vect = $_POST['select_right'];
-	        	foreach ($vect as $responsableId) {
-	        		$data[] = (int) $responsableId;
-	        	}						
-			}
-			
-			$model->responsables = $data;
-			
+
+		if(isset($_POST['Responsables']))
+		{
+			$model->attributes=$_POST['Responsables'];
 			if($model->save())
 				$this->redirect(array('view','id'=>$model->id));
 		}
@@ -101,26 +90,16 @@ class FinancierasController extends Controller
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
-		if(isset($_POST['Financieras'])) {
-			
-			$data=array();
-			
-			$model->attributes=$_POST['Financieras'];
-			
-			if (isset($_POST['select_right'])) {
-	        	$vect = $_POST['select_right'];
-	        	foreach ($vect as $responsableId) {
-	        		$data[] = (int) $responsableId;
-	        	}						
-			}
-			
-			$model->responsables = $data;
-			
+		if(isset($_POST['Responsables']))
+		{
+			$model->attributes=$_POST['Responsables'];
 			if($model->save())
 				$this->redirect(array('view','id'=>$model->id));
 		}
 
-		$this->render('update',array('model'=>$model,));
+		$this->render('update',array(
+			'model'=>$model,
+		));
 	}
 
 	/**
@@ -133,13 +112,7 @@ class FinancierasController extends Controller
 		if(Yii::app()->request->isPostRequest)
 		{
 			// we only allow deletion via POST request
-			
-			$model = $this->loadModel($id); 
-			
-			$model->responsables = array();
-			
-			if ($model->save())
-				$model->delete();
+			$this->loadModel($id)->delete();
 
 			// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
 			if(!isset($_GET['ajax']))
@@ -154,7 +127,7 @@ class FinancierasController extends Controller
 	 */
 	public function actionIndex()
 	{
-		$dataProvider=new CActiveDataProvider('Financieras');
+		$dataProvider=new CActiveDataProvider('Responsables');
 		$this->render('index',array(
 			'dataProvider'=>$dataProvider,
 		));
@@ -165,10 +138,10 @@ class FinancierasController extends Controller
 	 */
 	public function actionAdmin()
 	{
-		$model=new Financieras('search');
+		$model=new Responsables('search');
 		$model->unsetAttributes();  // clear any default values
-		if(isset($_GET['Financieras']))
-			$model->attributes=$_GET['Financieras'];
+		if(isset($_GET['Responsables']))
+			$model->attributes=$_GET['Responsables'];
 
 		$this->render('admin',array(
 			'model'=>$model,
@@ -182,7 +155,7 @@ class FinancierasController extends Controller
 	 */
 	public function loadModel($id)
 	{
-		$model=Financieras::model()->findByPk($id);
+		$model=Responsables::model()->findByPk($id);
 		if($model===null)
 			throw new CHttpException(404,'The requested page does not exist.');
 		return $model;
@@ -194,33 +167,10 @@ class FinancierasController extends Controller
 	 */
 	protected function performAjaxValidation($model)
 	{
-		if(isset($_POST['ajax']) && $_POST['ajax']==='financieras-form')
+		if(isset($_POST['ajax']) && $_POST['ajax']==='responsables-form')
 		{
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}
 	}
-	
-	protected function dibujarCeldaLista($data) 
-    {
-    	$model = $this->loadModel($data->id);
-		
-		$contenido = '';
-		
-		foreach ($model->responsables as $responsable)
-			$contenido = $contenido.CHtml::encode($responsable['nombre'].' - Cel.: '.$responsable['celular'].' - E-Mail.: '.$responsable['email']).'<br>';
-		
-		return $contenido;
-    } 	
-	protected function dibujarCeldaGrilla($data) 
-    {
-    	$model = $this->loadModel($data->id);
-		
-		$contenido = '';
-		
-		foreach ($model->responsables as $responsable)
-			$contenido = $contenido.'<b>'.CHtml::encode($responsable['nombre']).'</b><br>'.CHtml::encode($responsable['celular']).'<br>'.CHtml::encode($responsable['email']).'<br>';
-		
-		return $contenido;
-    } 	
 }

@@ -5,7 +5,7 @@
 	'enableAjaxValidation'=>false,
 )); ?>
 
-	<p class="note">Los Campos con <span class="required">*</span> son Obligatorios.</p>
+	<p class="note">Los Campos con <span class="required">*</span> son obligatorios.</p>
 
 	<?php echo $form->errorSummary($model); ?>
 
@@ -28,24 +28,6 @@
 	</div>
 
 	<div class="row">
-		<?php echo $form->labelEx($model,'responsable'); ?>
-		<?php echo $form->textField($model,'responsable',array('size'=>45,'maxlength'=>45)); ?>
-		<?php echo $form->error($model,'responsable'); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->labelEx($model,'celular'); ?>
-		<?php echo $form->textField($model,'celular',array('size'=>45,'maxlength'=>45)); ?>
-		<?php echo $form->error($model,'celular'); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->labelEx($model,'email'); ?>
-		<?php echo $form->textField($model,'email',array('size'=>45,'maxlength'=>45)); ?>
-		<?php echo $form->error($model,'email'); ?>
-	</div>
-
-	<div class="row">
 		<?php echo $form->labelEx($model,'tasaPromedio'); ?>
 		<?php echo $form->textField($model,'tasaPromedio',array('size'=>5,'maxlength'=>5)); ?>
 		<?php echo $form->error($model,'tasaPromedio'); ?>
@@ -62,6 +44,29 @@
 		<?php echo $form->textField($model,'tasaPesificacion',array('size'=>5,'maxlength'=>5)); ?>
 		<?php echo $form->error($model,'tasaPesificacion'); ?>
 	</div>
+
+	<div class="row">
+		<?php echo $form->error($model,'responsables'); ?>
+		<?php
+			$ids = array();
+			foreach($model->responsables as $record)
+				$ids[] = $record->id ;
+			
+			$responsablesDisponibles = Responsables::model()->responsablesDisponibles($ids);
+			
+			$this->widget('application.extensions.widgets.multiselects.XMultiSelects',array(
+			    'leftTitle'=>'Disponibles',
+			    'leftName'=>'disponibles',
+			    'leftList'=>CHtml::listData($responsablesDisponibles->getData(),'id','nombre'),
+			    'rightTitle'=>'Seleccionados',
+			    'rightName'=>'select_right[]',
+			    'rightList'=>CHtml::listData($model->responsables,'id','nombre'),
+			    'size'=>10,
+			    'width'=>'200px',
+			));
+		?>
+	</div>	
+
 
 	<div class="row buttons">
 		<?php echo CHtml::submitButton($model->isNewRecord ? 'Guardar' : 'Guardar Cambios'); ?>

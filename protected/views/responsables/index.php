@@ -1,15 +1,15 @@
 <?php
 $this->breadcrumbs=array(
-	'Financieras',
+	'Responsables',
 );
 
 $this->menu=array(
-	array('label'=>'Nueva Financiera', 'url'=>array('create')),
-	array('label'=>'Administrar Financieras', 'url'=>array('admin')),
+	array('label'=>'Nuevo Responsable', 'url'=>array('create')),
+	array('label'=>'Administrar Responsables', 'url'=>array('admin')),
 );
 ?>
 
-<h1>Financieras</h1>
+<h1>Responsables</h1>
 
 <?php $this->widget('zii.widgets.CListView', array(
 	'dataProvider'=>$dataProvider,

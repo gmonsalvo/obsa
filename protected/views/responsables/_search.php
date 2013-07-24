@@ -12,32 +12,22 @@
 
 	<div class="row">
 		<?php echo $form->label($model,'nombre'); ?>
-		<?php echo $form->textField($model,'nombre',array('size'=>60,'maxlength'=>100)); ?>
+		<?php echo $form->textField($model,'nombre',array('size'=>45,'maxlength'=>45)); ?>
 	</div>
 
 	<div class="row">
-		<?php echo $form->label($model,'direccion'); ?>
-		<?php echo $form->textField($model,'direccion',array('size'=>45,'maxlength'=>45)); ?>
+		<?php echo $form->label($model,'email'); ?>
+		<?php echo $form->textField($model,'email',array('size'=>60,'maxlength'=>100)); ?>
 	</div>
 
 	<div class="row">
-		<?php echo $form->label($model,'telefono'); ?>
-		<?php echo $form->textField($model,'telefono',array('size'=>45,'maxlength'=>45)); ?>
+		<?php echo $form->label($model,'celular'); ?>
+		<?php echo $form->textField($model,'celular',array('size'=>45,'maxlength'=>45)); ?>
 	</div>
 
 	<div class="row">
-		<?php echo $form->label($model,'tasaPromedio'); ?>
-		<?php echo $form->textField($model,'tasaPromedio',array('size'=>5,'maxlength'=>5)); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->label($model,'diasClearing'); ?>
-		<?php echo $form->textField($model,'diasClearing'); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->label($model,'tasaPesificacion'); ?>
-		<?php echo $form->textField($model,'tasaPesificacion',array('size'=>5,'maxlength'=>5)); ?>
+		<?php echo $form->label($model,'fijo'); ?>
+		<?php echo $form->textField($model,'fijo',array('size'=>45,'maxlength'=>45)); ?>
 	</div>
 	<!--
 	<div class="row">

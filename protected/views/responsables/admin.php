@@ -1,12 +1,12 @@
 <?php
 $this->breadcrumbs=array(
-	'Financieras'=>array('index'),
+	'Responsables'=>array('index'),
 	'Administrar',
 );
 
 $this->menu=array(
-	array('label'=>'Listar Financieras', 'url'=>array('index')),
-	array('label'=>'Nueva Financiera', 'url'=>array('create')),
+	array('label'=>'Listar Responsables', 'url'=>array('index')),
+	array('label'=>'Nuevo Responsable', 'url'=>array('create')),
 );
 
 Yii::app()->clientScript->registerScript('search', "
@@ -15,7 +15,7 @@ $('.search-button').click(function(){
 	return false;
 });
 $('.search-form form').submit(function(){
-	$.fn.yiiGridView.update('financieras-grid', {
+	$.fn.yiiGridView.update('responsables-grid', {
 		data: $(this).serialize()
 	});
 	return false;
@@ -23,8 +23,7 @@ $('.search-form form').submit(function(){
 ");
 ?>
 
-<h1>Administrar Financieras</h1>
-
+<h1>Administrar Responsables</h1>
 
 <?php echo CHtml::link(CHtml::encode('Búsqueda Avanzada'),'#',array('class'=>'search-button')); ?>
 <div class="search-form" style="display:none">
@@ -34,22 +33,15 @@ $('.search-form form').submit(function(){
 </div><!-- search-form -->
 
 <?php $this->widget('zii.widgets.grid.CGridView', array(
-	'id'=>'financieras-grid',
+	'id'=>'responsables-grid',
 	'dataProvider'=>$model->search(),
 	'filter'=>$model,
 	'columns'=>array(
 		'id',
 		'nombre',
-		'direccion',
-		'telefono',
-		'tasaPromedio',
-		'diasClearing',
-		'tasaPesificacion',
-		array(
-			'header'=>'Responsables',
-			'type'=>'raw',
-			'value'=>array($this, 'dibujarCeldaGrilla'),
-		),
+		'email',
+		'celular',
+		'fijo',
 		/*
 		'userStamp',
 		'timeStamp',

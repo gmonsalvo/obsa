@@ -16,19 +16,6 @@
 	<?php echo CHtml::encode($data->telefono); ?>
 	<br />
 
-	<b><?php echo CHtml::encode($data->getAttributeLabel('responsable')); ?>:</b>
-	<?php echo CHtml::encode($data->responsable); ?>
-	<br />
-
-	<b><?php echo CHtml::encode($data->getAttributeLabel('celular')); ?>:</b>
-	<?php echo CHtml::encode($data->celular); ?>
-	<br />
-
-	<b><?php echo CHtml::encode($data->getAttributeLabel('email')); ?>:</b>
-	<?php echo CHtml::encode($data->email); ?>
-	<br />
-
-	<?php /*
 	<b><?php echo CHtml::encode($data->getAttributeLabel('tasaPromedio')); ?>:</b>
 	<?php echo CHtml::encode($data->tasaPromedio); ?>
 	<br />
@@ -40,7 +27,16 @@
 	<b><?php echo CHtml::encode($data->getAttributeLabel('tasaPesificacion')); ?>:</b>
 	<?php echo CHtml::encode($data->tasaPesificacion); ?>
 	<br />
-
+	
+	<b><?php echo CHtml::encode('Responsables'); ?>:</b>
+	<br/>
+	<?php /*echo CHtml::encode($data->responsables->id);*/
+		foreach($data->responsables as $responsable) {
+			echo CHtml::encode($responsable['nombre'].' - Cel.: '.$responsable['celular'].' - E-Mail: '.$responsable['email']);
+			echo '<br>';
+		}
+	?>
+	<?php /*
 	<b><?php echo CHtml::encode($data->getAttributeLabel('userStamp')); ?>:</b>
 	<?php echo CHtml::encode($data->userStamp); ?>
 	<br />
