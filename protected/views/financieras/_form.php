@@ -48,11 +48,15 @@
 	<div class="row">
 		<?php echo $form->error($model,'responsables'); ?>
 		<?php
+			$model->refresh();
+		
 			$ids = array();
 			 
 			if ($model->responsables) {
+				//echo var_dump($model->responsables);
 				foreach($model->responsables as $record)
-					if ($record && is_object($record))
+					//echo var_dump($record);
+					if ($record)
 						$ids[] = $record->id ;
 			}
 			
