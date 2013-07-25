@@ -49,8 +49,12 @@
 		<?php echo $form->error($model,'responsables'); ?>
 		<?php
 			$ids = array();
-			foreach($model->responsables as $record)
-				$ids[] = $record->id ;
+			 
+			if ($model->responsables) {
+				foreach($model->responsables as $record)
+					if ($record && is_object($record))
+						$ids[] = $record->id ;
+			}
 			
 			$responsablesDisponibles = Responsables::model()->responsablesDisponibles($ids);
 			

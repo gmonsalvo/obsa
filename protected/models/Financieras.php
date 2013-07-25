@@ -25,7 +25,7 @@ class Financieras extends CActiveRecord
 	 * @return Financieras the static model class
 	 */
 	
-	public $errorResponsables;
+	public $responsablesBusqueda;
 	
 	public static function model($className=__CLASS__)
 	{
@@ -55,9 +55,10 @@ class Financieras extends CActiveRecord
 			array('tasaPromedio, tasaPesificacion', 'length', 'max'=>5),
 			array('tasaPromedio, tasaPesificacion', 'numerical', 'integerOnly'=>false),
 			array('tasaPromedio, tasaPesificacion', 'numerical', 'integerOnly'=>false),
+			//array('responsables', 'validarResponsables', 'message'=>'Debe especificar al menos dos responsables para la financiera'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, nombre, direccion, telefono, tasaPromedio, diasClearing, tasaPesificacion, userStamp, timeStamp', 'safe', 'on'=>'search'),
+			array('id, nombre, direccion, telefono, tasaPromedio, diasClearing, tasaPesificacion, responsablesBusqueda, userStamp, timeStamp', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -103,7 +104,7 @@ class Financieras extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('id',$this->id,true);
-		$criteria->compare('nombre',$this->nombre,true);
+		$criteria->compare('t.nombre',$this->nombre,true);
 		$criteria->compare('direccion',$this->direccion,true);
 		$criteria->compare('telefono',$this->telefono,true);
 		$criteria->compare('tasaPromedio',$this->tasaPromedio,true);
@@ -111,9 +112,15 @@ class Financieras extends CActiveRecord
 		$criteria->compare('tasaPesificacion',$this->tasaPesificacion,true);
 		$criteria->compare('userStamp',$this->userStamp,true);
 		$criteria->compare('timeStamp',$this->timeStamp,true);
-
+		$criteria->with = array('responsables');
+		$criteria->compare('CONCAT(responsables.nombre, responsables.celular, responsables.email)',$this->responsablesBusqueda,true);
+		//$criteria->compare('responsables.celular',$this->responsablesBusqueda,true);
+		//$criteria->compare('responsables.email',$this->responsablesBusqueda,true);
+		$criteria->together = true;
+		
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
+			'sort'=>array('attributes'=>array('responsablesBusqueda'=>array('asc'=>'responsables.nombre', 'desc'=>'responsables.nombre', ), '*', ), ),			
 		));
 	}
 	
@@ -130,6 +137,12 @@ class Financieras extends CActiveRecord
         $this->userStamp = Yii::app()->user->model->username;
         $this->timeStamp = Date("Y-m-d h:m:s");
 		
-		return parent::beforeValidate();
+		return parent::beforeValidate();; 
+	}
+	
+	public function validarResponsables($attribute, $params)
+	{
+    	if (count($this->responsables) <= 1)
+			$this->addError($attribute, $params['message']);
 	}
 }

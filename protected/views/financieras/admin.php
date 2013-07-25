@@ -47,6 +47,7 @@ $('.search-form form').submit(function(){
 		'tasaPesificacion',
 		array(
 			'header'=>'Responsables',
+			'name'=>'responsablesBusqueda',
 			'type'=>'raw',
 			'value'=>array($this, 'dibujarCeldaGrilla'),
 		),
