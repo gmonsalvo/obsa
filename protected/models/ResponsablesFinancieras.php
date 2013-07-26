@@ -16,6 +16,17 @@
  */
 class ResponsablesFinancieras extends CActiveRecord
 {
+	////// Métodos nuevos
+	
+	public function behaviors() 
+	{
+    	return array(
+        	'LoggableBehavior' => 'application.modules.auditTrail.behaviors.LoggableBehavior',
+    	);
+	}	
+		
+	////// Métodos generados
+	
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.

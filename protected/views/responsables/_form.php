@@ -32,6 +32,18 @@
 		<?php echo $form->textField($model,'fijo',array('size'=>45,'maxlength'=>45)); ?>
 		<?php echo $form->error($model,'fijo'); ?>
 	</div>
+	
+	<div class="row">
+		<?php echo "<b>".CHtml::encode("Financieras")."</b><br>"?>
+		<?php
+			$model->refresh();
+			foreach($model->financieras as $record) {
+				echo "<span style='padding-left: 10px;'><b>".CHtml::encode($record->nombre)."</b> - ".CHtml::encode($record->direccion)." - ".CHtml::encode($record->telefono)."</span><br>";
+			}
+			echo "<span>".CHtml::encode("* Para modificar las financieras asociadas utilice la administración de financieras")."</span>";
+		?>
+	</div>
+	
 	<!--
 	<div class="row">
 		<?php echo $form->labelEx($model,'userStamp'); ?>

@@ -42,6 +42,12 @@ $('.search-form form').submit(function(){
 		'email',
 		'celular',
 		'fijo',
+		array(
+			'header'=>'Financieras',
+			'name'=>'financierasBusqueda',
+			'type'=>'raw',
+			'value'=>array($this, 'dibujarCeldaGrilla'),
+		),		
 		/*
 		'userStamp',
 		'timeStamp',

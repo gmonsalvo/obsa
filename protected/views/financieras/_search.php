@@ -39,6 +39,11 @@
 		<?php echo $form->label($model,'tasaPesificacion'); ?>
 		<?php echo $form->textField($model,'tasaPesificacion',array('size'=>5,'maxlength'=>5)); ?>
 	</div>
+	
+	<div class="row">
+		<?php echo $form->label($model,'responsables'); ?>
+		<?php echo $form->textField($model,'responsablesBusqueda',array('size'=>45,'maxlength'=>45)); ?>
+	</div>
 	<!--
 	<div class="row">
 		<?php echo $form->label($model,'userStamp'); ?>

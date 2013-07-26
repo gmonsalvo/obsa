@@ -2,6 +2,36 @@
 
 class ResponsablesController extends Controller
 {
+	////// Propiedades
+	
+	////// Métodos nuevos
+	
+	protected function dibujarCeldaLista($data) 
+    {
+    	$model = $this->loadModel($data->id);
+		
+		$contenido = '';
+		
+		foreach ($model->financieras as $financiera)
+			$contenido = $contenido.CHtml::encode($financiera['nombre'].' - '.$financiera['direccion'].' - '.$financiera['telefono']).'<br>';
+		
+		return $contenido;
+    }
+	 	
+	protected function dibujarCeldaGrilla($data) 
+    {
+    	$model = $this->loadModel($data->id);
+		
+		$contenido = '';
+		
+		foreach ($model->financieras as $financiera)
+			$contenido = $contenido."<b>".CHtml::encode($financiera['nombre']).'</b><br>'.CHtml::encode($financiera['direccion']).'<br>'.CHtml::encode($financiera['telefono']).'<br>';
+		
+		return $contenido;
+    } 	
+		
+	////// Métodos generados
+	
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
 	 * using two-column layout. See 'protected/views/layouts/column2.php'.
@@ -111,9 +141,13 @@ class ResponsablesController extends Controller
 	{
 		if(Yii::app()->request->isPostRequest)
 		{
-			// we only allow deletion via POST request
-			$this->loadModel($id)->delete();
-
+			$model = $this->loadModel($id); 
+			
+			$model->financieras = array();
+			
+			if ($model->save())
+				$model->delete();
+			
 			// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
 			if(!isset($_GET['ajax']))
 				$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));

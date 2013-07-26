@@ -19,13 +19,40 @@
  */
 class Financieras extends CActiveRecord
 {
+	////// Propiedades
+	
+	public $responsablesBusqueda;
+	
+	////// Métodos nuevos
+	
+	public function behaviors()
+	{
+    	return array(
+        	'LoggableBehavior' => 'application.modules.auditTrail.behaviors.LoggableBehavior',
+            'activerecord-relation'=>array('class'=>'ext.yiiext.behaviors.activerecord-relation.EActiveRecordRelationBehavior',),
+    	);
+	}	
+	
+	public function beforeValidate()
+	{
+        $this->userStamp = Yii::app()->user->model->username;
+        $this->timeStamp = Date("Y-m-d h:m:s");
+		
+		return parent::beforeValidate();; 
+	}
+	
+	public function validarResponsables($attribute, $params)
+	{
+    	if (count($this->responsables) <= 1)
+			$this->addError($attribute, $params['message']);
+	}
+	
+	////// Métodos generados
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
 	 * @return Financieras the static model class
 	 */
-	
-	public $responsablesBusqueda;
 	
 	public static function model($className=__CLASS__)
 	{
@@ -87,6 +114,7 @@ class Financieras extends CActiveRecord
 			'tasaPromedio' => 'Tasa Promedio',
 			'diasClearing' => 'Dias Clearing',
 			'tasaPesificacion' => 'Tasa Pesificacion',
+			'financieras' => 'Financieras',
 			'userStamp' => 'User Stamp',
 			'timeStamp' => 'Time Stamp',
 		);
@@ -114,35 +142,11 @@ class Financieras extends CActiveRecord
 		$criteria->compare('timeStamp',$this->timeStamp,true);
 		$criteria->with = array('responsables');
 		$criteria->compare('CONCAT(responsables.nombre, responsables.celular, responsables.email)',$this->responsablesBusqueda,true);
-		//$criteria->compare('responsables.celular',$this->responsablesBusqueda,true);
-		//$criteria->compare('responsables.email',$this->responsablesBusqueda,true);
 		$criteria->together = true;
 		
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
 			'sort'=>array('attributes'=>array('responsablesBusqueda'=>array('asc'=>'responsables.nombre', 'desc'=>'responsables.nombre', ), '*', ), ),			
 		));
-	}
-	
-	public function behaviors()
-	{
-    	return array(
-        	'LoggableBehavior' => 'application.modules.auditTrail.behaviors.LoggableBehavior',
-            'activerecord-relation'=>array('class'=>'ext.yiiext.behaviors.activerecord-relation.EActiveRecordRelationBehavior',),
-    	);
-	}	
-	
-	public function beforeValidate()
-	{
-        $this->userStamp = Yii::app()->user->model->username;
-        $this->timeStamp = Date("Y-m-d h:m:s");
-		
-		return parent::beforeValidate();; 
-	}
-	
-	public function validarResponsables($attribute, $params)
-	{
-    	if (count($this->responsables) <= 1)
-			$this->addError($attribute, $params['message']);
 	}
 }

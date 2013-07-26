@@ -2,6 +2,37 @@
 
 class FinancierasController extends Controller
 {
+	////// Propiedades
+	
+	////// Métodos nuevos
+	
+	protected function dibujarCeldaLista($data) 
+    {
+    	$model = $this->loadModel($data->id);
+		
+		$contenido = '';
+		
+		foreach ($model->responsables as $responsable)
+			$contenido = $contenido.CHtml::encode($responsable['nombre'].' - Cel.: '.$responsable['celular'].' - E-Mail.: '.$responsable['email']).'<br>';
+		
+		return $contenido;
+    }
+	 	
+	protected function dibujarCeldaGrilla($data) 
+    {
+    	$model = $this->loadModel($data->id);
+		
+		$contenido = '';
+		
+		foreach ($model->responsables as $responsable)
+			$contenido = $contenido.'<b>'.CHtml::encode($responsable['nombre']).'</b><br>'.CHtml::encode($responsable['celular']).'<br>'.CHtml::encode($responsable['email']).'<br>';
+		
+		return $contenido;
+    } 	
+		
+	
+	////// Métodos generados
+	
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
 	 * using two-column layout. See 'protected/views/layouts/column2.php'.
@@ -200,27 +231,4 @@ class FinancierasController extends Controller
 			Yii::app()->end();
 		}
 	}
-	
-	protected function dibujarCeldaLista($data) 
-    {
-    	$model = $this->loadModel($data->id);
-		
-		$contenido = '';
-		
-		foreach ($model->responsables as $responsable)
-			$contenido = $contenido.CHtml::encode($responsable['nombre'].' - Cel.: '.$responsable['celular'].' - E-Mail.: '.$responsable['email']).'<br>';
-		
-		return $contenido;
-    } 	
-	protected function dibujarCeldaGrilla($data) 
-    {
-    	$model = $this->loadModel($data->id);
-		
-		$contenido = '';
-		
-		foreach ($model->responsables as $responsable)
-			$contenido = $contenido.'<b>'.CHtml::encode($responsable['nombre']).'</b><br>'.CHtml::encode($responsable['celular']).'<br>'.CHtml::encode($responsable['email']).'<br>';
-		
-		return $contenido;
-    } 	
 }

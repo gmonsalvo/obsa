@@ -19,6 +19,15 @@
 	<b><?php echo CHtml::encode($data->getAttributeLabel('fijo')); ?>:</b>
 	<?php echo CHtml::encode($data->fijo); ?>
 	<br />
+	
+	<b><?php echo CHtml::encode('Financieras'); ?>:</b>
+	<br/>
+	<?php /*echo CHtml::encode($data->responsables->id);*/
+		foreach($data->financieras as $financiera) {
+			echo CHtml::encode($financiera['nombre'].' - '.$financiera['direccion'].' - '.$financiera['telefono']);
+			echo '<br>';
+		}
+	?>
 	<!--
 	<b><?php echo CHtml::encode($data->getAttributeLabel('userStamp')); ?>:</b>
 	<?php echo CHtml::encode($data->userStamp); ?>

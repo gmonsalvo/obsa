@@ -13,7 +13,7 @@ $this->menu=array(
 );
 ?>
 
-<h1>Ver Responsable #<?php echo $model->nombre; ?></h1>
+<h1>Ver Responsable: <?php echo $model->nombre; ?></h1>
 
 <?php $this->widget('zii.widgets.CDetailView', array(
 	'data'=>$model,
@@ -23,5 +23,10 @@ $this->menu=array(
 		'email',
 		'celular',
 		'fijo',
+		array(
+	       'label'=>'Financieras',
+	       'type'=>'raw',
+	       'value'=>$this->dibujarCeldaLista($model),
+        ),
 	),
 )); ?>

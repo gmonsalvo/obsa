@@ -17,6 +17,39 @@
  */
 class Responsables extends CActiveRecord
 {
+	////// Propiedades
+	
+	public $financierasBusqueda;
+	
+	////// Métodos nuevos
+	
+	public function behaviors() 
+	{
+    	return array(
+        	'LoggableBehavior' => 'application.modules.auditTrail.behaviors.LoggableBehavior',
+        	'activerecord-relation'=>array('class'=>'ext.yiiext.behaviors.activerecord-relation.EActiveRecordRelationBehavior',),
+    	);
+	}	
+	
+	public function beforeValidate()
+	{
+        $this->userStamp = Yii::app()->user->model->username;
+        $this->timeStamp = Date("Y-m-d h:m:s");
+		
+		return parent::beforeValidate();
+	}
+	
+	public function responsablesDisponibles($ids)
+	{
+		$criteria = new CDbCriteria;
+
+		$criteria->addNotInCondition('id',$ids);
+		
+		return new CActiveDataProvider($this, array('criteria'=>$criteria,));
+	}
+	
+	////// Métodos generados
+	
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
@@ -48,7 +81,7 @@ class Responsables extends CActiveRecord
 			array('email', 'email'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, nombre, email, celular, fijo, userStamp, timeStamp', 'safe', 'on'=>'search'),
+			array('id, nombre, email, celular, fijo, financierasBusqueda, userStamp, timeStamp', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -60,7 +93,7 @@ class Responsables extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'responsablesFinancierases' => array(self::HAS_MANY, 'ResponsablesFinancieras', 'responsableId'),
+			'financieras' => array(self::MANY_MANY, 'Financieras', 'responsablesFinancieras(financieraId,responsableId)'),
 		);
 	}
 
@@ -77,6 +110,7 @@ class Responsables extends CActiveRecord
 			'fijo' => 'Fijo',
 			'userStamp' => 'User Stamp',
 			'timeStamp' => 'Time Stamp',
+			'financieras' => 'Financieras',
 		);
 	}
 
@@ -92,39 +126,19 @@ class Responsables extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('id',$this->id,true);
-		$criteria->compare('nombre',$this->nombre,true);
+		$criteria->compare('t.nombre',$this->nombre,true);
 		$criteria->compare('email',$this->email,true);
 		$criteria->compare('celular',$this->celular,true);
 		$criteria->compare('fijo',$this->fijo,true);
 		$criteria->compare('userStamp',$this->userStamp,true);
 		$criteria->compare('timeStamp',$this->timeStamp,true);
-
+		$criteria->with = array('financieras');
+		$criteria->compare('CONCAT(financieras.nombre, financieras.direccion, financieras.telefono)', $this->financierasBusqueda, true);
+		$criteria->together = true;
+		
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
+			'sort'=>array('attributes'=>array('financierasBusqueda'=>array('asc'=>'financieras.nombre', 'desc'=>'financieras.nombre', ), '*', ), ),
 		));
-	}
-	
-	public function behaviors() 
-	{
-    	return array(
-        	'LoggableBehavior' => 'application.modules.auditTrail.behaviors.LoggableBehavior',
-    	);
-	}	
-	
-	public function beforeValidate()
-	{
-        $this->userStamp = Yii::app()->user->model->username;
-        $this->timeStamp = Date("Y-m-d h:m:s");
-		
-		return parent::beforeValidate();
-	}
-	
-	public function responsablesDisponibles($ids)
-	{
-		$criteria = new CDbCriteria;
-
-		$criteria->addNotInCondition('id',$ids);
-		
-		return new CActiveDataProvider($this, array('criteria'=>$criteria,));
 	}
 }

@@ -29,6 +29,11 @@
 		<?php echo $form->label($model,'fijo'); ?>
 		<?php echo $form->textField($model,'fijo',array('size'=>45,'maxlength'=>45)); ?>
 	</div>
+	
+	<div class="row">
+		<?php echo $form->label($model,'financieras'); ?>
+		<?php echo $form->textField($model,'financierasBusqueda',array('size'=>45,'maxlength'=>45)); ?>
+	</div>
 	<!--
 	<div class="row">
 		<?php echo $form->label($model,'userStamp'); ?>

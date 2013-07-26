@@ -45,7 +45,7 @@
 		<?php echo $form->error($model,'tasaPesificacion'); ?>
 	</div>
 
-	<div class="row">
+	<div class="row" style="width: 100px">
 		<?php echo $form->error($model,'responsables'); ?>
 		<?php
 			$model->refresh();
