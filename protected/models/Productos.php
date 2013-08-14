@@ -17,6 +17,37 @@
  */
 class Productos extends CustomCActiveRecord
 {
+	////// Propiedades
+	
+	////// Métodos nuevos
+	
+	public function behaviors()
+	{
+    	return array(
+        	'LoggableBehavior' => 'application.modules.auditTrail.behaviors.LoggableBehavior',
+            'activerecord-relation'=>array('class'=>'ext.yiiext.behaviors.activerecord-relation.EActiveRecordRelationBehavior',),
+    	);
+	}	
+	
+	public function beforeValidate()
+	{
+        $this->userStamp = Yii::app()->user->model->username;
+        $this->timeStamp = Date("Y-m-d h:m:s");
+		
+		return parent::beforeValidate();; 
+	}
+	
+	public function productosDisponibles($ids)
+	{
+		$criteria = new CDbCriteria;
+
+		$criteria->addNotInCondition('id',$ids);
+		
+		return new CActiveDataProvider($this, array('criteria'=>$criteria,));
+	}
+	
+	////// Métodos generados
+	
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @return Productos the static model class

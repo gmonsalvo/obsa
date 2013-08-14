@@ -22,6 +22,7 @@ class Financieras extends CActiveRecord
 	////// Propiedades
 	
 	public $responsablesBusqueda;
+	public $productosBusqueda;
 	
 	////// Métodos nuevos
 	
@@ -85,7 +86,7 @@ class Financieras extends CActiveRecord
 			array('responsables', 'validarResponsables', 'message'=>'Debe especificar al menos dos responsables para la financiera'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, nombre, direccion, telefono, tasaPromedio, diasClearing, tasaPesificacion, responsablesBusqueda, userStamp, timeStamp', 'safe', 'on'=>'search'),
+			array('id, nombre, direccion, telefono, tasaPromedio, diasClearing, tasaPesificacion, responsablesBusqueda, productosBusqueda, userStamp, timeStamp', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -98,6 +99,7 @@ class Financieras extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'responsables' => array(self::MANY_MANY, 'Responsables', 'responsablesFinancieras(financieraId,responsableId)'),
+			'productos' => array(self::MANY_MANY, 'Productos', 'productoctacte(pkModeloRelacionado,productoId)'),
 		);
 	}
 
@@ -143,6 +145,10 @@ class Financieras extends CActiveRecord
 		$criteria->with = array('responsables');
 		$criteria->compare('CONCAT(responsables.nombre, responsables.celular, responsables.email)',$this->responsablesBusqueda,true);
 		$criteria->together = true;
+		/*
+		$criteria->with = array('productos');
+		$criteria->compare('CONCAT(productos.nombre, productos.descripcion)',$this->productosBusqueda,true);
+		$criteria->together = true;*/
 		
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

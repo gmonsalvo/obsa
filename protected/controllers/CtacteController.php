@@ -1,40 +1,7 @@
 <?php
 
-class FinancierasController extends Controller
+class CtacteController extends Controller
 {
-	////// Propiedades
-	
-	////// Métodos nuevos
-	
-	////// Métodos generados
-	
-	protected function dibujarCeldaLista($data) 
-    {
-    	$model = $this->loadModel($data->id);
-		
-		$contenido = '';
-		
-		foreach ($model->responsables as $responsable)
-			$contenido = $contenido.CHtml::encode($responsable['nombre'].' - Cel.: '.$responsable['celular'].' - E-Mail.: '.$responsable['email']).'<br>';
-		
-		return $contenido;
-    }
-	 	
-	protected function dibujarCeldaGrilla($data) 
-    {
-    	$model = $this->loadModel($data->id);
-		
-		$contenido = '';
-		
-		foreach ($model->responsables as $responsable)
-			$contenido = $contenido.'<b>'.CHtml::encode($responsable['nombre']).'</b><br>'.CHtml::encode($responsable['celular']).'<br>'.CHtml::encode($responsable['email']).'<br>';
-		
-		return $contenido;
-    } 	
-		
-	
-	////// Métodos generados
-	
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
 	 * using two-column layout. See 'protected/views/layouts/column2.php'.
@@ -64,7 +31,7 @@ class FinancierasController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create', 'update', 'admin', 'delete'),
+				'actions'=>array('create','update'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -94,36 +61,14 @@ class FinancierasController extends Controller
 	 */
 	public function actionCreate()
 	{
-		$model=new Financieras;
+		$model=new Ctacte;
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
-				
-		if(isset($_POST['Financieras'])) {
-			$model->attributes=$_POST['Financieras'];
-			
-			$data=array();
-			
-			if (isset($_POST['select_right'])) {
-	        	$vect = $_POST['select_right'];
-	        	foreach ($vect as $responsableId) {
-	        		$data[] = (int) $responsableId;
-	        	}						
-			}
-			
-			$model->responsables = $data;
-			
-			$data=array();
-			
-			if (isset($_POST['productosSeleccionados'])) {
-	        	$vect = $_POST['productosSeleccionados'];
-	        	foreach ($vect as $productoId) {
-	        		$data[] = (int) $productoId;
-	        	}						
-			}
-			
-			$model->productos = $data;
-			
+
+		if(isset($_POST['Ctacte']))
+		{
+			$model->attributes=$_POST['Ctacte'];
 			if($model->save())
 				$this->redirect(array('view','id'=>$model->id));
 		}
@@ -145,45 +90,16 @@ class FinancierasController extends Controller
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
-		if(isset($_POST['Financieras'])) {
-			
-			$data=array();
-			
-			$model->attributes=$_POST['Financieras'];
-			
-			if (isset($_POST['select_right'])) {
-	        	$vect = $_POST['select_right'];
-	        	foreach ($vect as $responsableId) {
-	        		$data[] = (int) $responsableId;
-	        	}						
-			}
-			
-			$model->responsables = $data;
-			
-			$data=array();
-			/*
-			header('Content-type: text/plain');
-			print_r($_POST);
-			exit;				
-			
-			if (isset($_GET['Post']['productos'])) {
-				
-	        	$vect = $_GET['Post']['productos'];
-				
-				//CVarDumper::dump($vect);
-				
-	        	foreach ($vect as $productoId) {
-	        		$data[] = (int) $productoId;
-	        	}						
-			}
-			
-			$model->productos = $data;
-			*/
+		if(isset($_POST['Ctacte']))
+		{
+			$model->attributes=$_POST['Ctacte'];
 			if($model->save())
 				$this->redirect(array('view','id'=>$model->id));
 		}
 
-		$this->render('update',array('model'=>$model,));
+		$this->render('update',array(
+			'model'=>$model,
+		));
 	}
 
 	/**
@@ -196,15 +112,7 @@ class FinancierasController extends Controller
 		if(Yii::app()->request->isPostRequest)
 		{
 			// we only allow deletion via POST request
-			
-			$model = $this->loadModel($id); 
-			
-			$model->responsables = array();
-			
-			$model->productos = array();
-			
-			if ($model->save())
-				$model->delete();
+			$this->loadModel($id)->delete();
 
 			// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
 			if(!isset($_GET['ajax']))
@@ -219,7 +127,7 @@ class FinancierasController extends Controller
 	 */
 	public function actionIndex()
 	{
-		$dataProvider=new CActiveDataProvider('Financieras');
+		$dataProvider=new CActiveDataProvider('Ctacte');
 		$this->render('index',array(
 			'dataProvider'=>$dataProvider,
 		));
@@ -230,10 +138,10 @@ class FinancierasController extends Controller
 	 */
 	public function actionAdmin()
 	{
-		$model=new Financieras('search');
+		$model=new Ctacte('search');
 		$model->unsetAttributes();  // clear any default values
-		if(isset($_GET['Financieras']))
-			$model->attributes=$_GET['Financieras'];
+		if(isset($_GET['Ctacte']))
+			$model->attributes=$_GET['Ctacte'];
 
 		$this->render('admin',array(
 			'model'=>$model,
@@ -247,7 +155,7 @@ class FinancierasController extends Controller
 	 */
 	public function loadModel($id)
 	{
-		$model=Financieras::model()->findByPk($id);
+		$model=Ctacte::model()->findByPk($id);
 		if($model===null)
 			throw new CHttpException(404,'The requested page does not exist.');
 		return $model;
@@ -259,7 +167,7 @@ class FinancierasController extends Controller
 	 */
 	protected function performAjaxValidation($model)
 	{
-		if(isset($_POST['ajax']) && $_POST['ajax']==='financieras-form')
+		if(isset($_POST['ajax']) && $_POST['ajax']==='ctacte-form')
 		{
 			echo CActiveForm::validate($model);
 			Yii::app()->end();

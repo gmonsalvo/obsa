@@ -44,9 +44,10 @@
 		<?php echo $form->textField($model,'tasaPesificacion',array('size'=>5,'maxlength'=>5)); ?>
 		<?php echo $form->error($model,'tasaPesificacion'); ?>
 	</div>
-
+	
 	<div class="row" style="width: 100px">
 		<?php echo $form->error($model,'responsables'); ?>
+		<?php echo $form->labelEx($model,'responsables'); ?>
 		<?php
 			$model->refresh();
 		
@@ -75,6 +76,20 @@
 		?>
 	</div>	
 
+	<div class="row" style="width: 200px">
+		<?php echo $form->error($model,'productos'); ?>
+		<?php echo $form->labelEx($model,'productos'); ?>
+		
+		<?php
+			$model->refresh();
+			
+			echo CHtml::activeCheckboxList(
+			  $model, 'productos', 
+			  CHtml::listData(Productos::model()->findAll(), 'id', 'nombre'),
+			  array('template'=>'<li>{input} {label}</li>',  'class'=>'categoryFilter',)
+			);
+		?>
+	</div>	
 
 	<div class="row buttons">
 		<?php echo CHtml::submitButton($model->isNewRecord ? 'Guardar' : 'Guardar Cambios'); ?>
