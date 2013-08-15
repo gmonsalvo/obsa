@@ -83,10 +83,20 @@
 		<?php
 			$model->refresh();
 			
+			$model->productosId = array();
+			
+			//print_r($model->productos);
+			
+			if ($model->productos) {
+				foreach($model->productos as $record)
+					if ($record)
+						$model->productosId[] = $record->id ;
+			}
+			
 			echo CHtml::activeCheckboxList(
-			  $model, 'productos', 
-			  CHtml::listData(Productos::model()->findAll(), 'id', 'nombre'),
-			  array('template'=>'<li>{input} {label}</li>',  'class'=>'categoryFilter',)
+			  $model, 'productosId', 
+			  CHtml::listData(Productos::model()->findAll(), 'id', 'nombre')/*,
+			  array('template'=>'<li>{input} {label}</li>',  'class'=>'categoryFilter',)*/
 			);
 		?>
 	</div>	

@@ -160,27 +160,35 @@ class FinancierasController extends Controller
 			
 			$model->responsables = $data;
 			
-			$data=array();
 			/*
 			header('Content-type: text/plain');
-			print_r($_POST);
-			exit;				
-			
-			if (isset($_GET['Post']['productos'])) {
-				
-	        	$vect = $_GET['Post']['productos'];
-				
-				//CVarDumper::dump($vect);
-				
-	        	foreach ($vect as $productoId) {
-	        		$data[] = (int) $productoId;
-	        	}						
-			}
-			
-			$model->productos = $data;
+			print_r($model->relacionProductosFinanciera);
+			exit;
 			*/
-			if($model->save())
-				$this->redirect(array('view','id'=>$model->id));
+			
+			$model->productos = array();
+			
+			$productos = $_POST['Financieras']['productosId'];
+			
+			if($model->save()) {
+				
+				$error = false;
+				
+				foreach ($productos as $idproducto) {
+					$relacion = new Productoctacte();
+					$relacion->nombreModelo = 'Financiera';
+					$relacion->pkModeloRelacionado = $model->id;
+					$relacion->productoId = (int) $idproducto;
+					if (!$relacion->save()) {
+						//$relacion->
+						$error = true;
+						break;
+					}
+				}
+				
+				if (!$error)
+					$this->redirect(array('view','id'=>$model->id));
+			}
 		}
 
 		$this->render('update',array('model'=>$model,));

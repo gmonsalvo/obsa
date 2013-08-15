@@ -23,6 +23,7 @@ class Financieras extends CActiveRecord
 	
 	public $responsablesBusqueda;
 	public $productosBusqueda;
+	public $productosId;
 	
 	////// Métodos nuevos
 	
@@ -99,7 +100,9 @@ class Financieras extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'responsables' => array(self::MANY_MANY, 'Responsables', 'responsablesFinancieras(financieraId,responsableId)'),
-			'productos' => array(self::MANY_MANY, 'Productos', 'productoctacte(pkModeloRelacionado,productoId)'),
+			'productosFinanciera' => array(self::HAS_MANY, 'Productoctacte', 'pkModeloRelacionado'),
+			'productos' => array(self::HAS_MANY, 'Productos', 'productoId', 'through'=>'productosFinanciera'),
+			//'productos' => array(self::MANY_MANY, 'Productos', 'productoctacte(pkModeloRelacionado,productoId)'/*, 'condition' => 'productos_productos.nombreModelo=:modelo', 'together'=>'yes', 'params'=>array(':modelo'=>'Financieras'),*/),
 		);
 	}
 
