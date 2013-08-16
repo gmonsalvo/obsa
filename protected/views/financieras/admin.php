@@ -49,7 +49,13 @@ $('.search-form form').submit(function(){
 			'header'=>'Responsables',
 			'name'=>'responsablesBusqueda',
 			'type'=>'raw',
-			'value'=>array($this, 'dibujarCeldaGrilla'),
+			'value'=>array($this, 'dibujarCeldaResponsablesGrilla'),
+		),
+		array(
+			'header'=>'Productos',
+			'name'=>'productosBusqueda',
+			'type'=>'raw',
+			'value'=>array($this, 'dibujarCeldaProductosGrilla'),
 		),
 		/*
 		'userStamp',

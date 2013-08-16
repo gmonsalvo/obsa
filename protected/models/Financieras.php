@@ -101,8 +101,8 @@ class Financieras extends CActiveRecord
 		return array(
 			'responsables' => array(self::MANY_MANY, 'Responsables', 'responsablesFinancieras(financieraId,responsableId)'),
 			'productosFinanciera' => array(self::HAS_MANY, 'Productoctacte', 'pkModeloRelacionado'),
-			'productos' => array(self::HAS_MANY, 'Productos', 'productoId', 'through'=>'productosFinanciera'),
-			//'productos' => array(self::MANY_MANY, 'Productos', 'productoctacte(pkModeloRelacionado,productoId)'/*, 'condition' => 'productos_productos.nombreModelo=:modelo', 'together'=>'yes', 'params'=>array(':modelo'=>'Financieras'),*/),
+			'productos' => array(self::HAS_MANY, 'Productos', 'productoId', 'through'=>'productosFinanciera', 'condition' => 'productosFinanciera.nombreModelo=\'Financieras\''),
+			//'productos' => array(self::MANY_MANY, 'Productos', 'productoctacte(pkModeloRelacionado,productoId)', 'condition' => 'productos_productos.nombreModelo=:modelo', 'together'=>'yes', 'params'=>array(':modelo'=>'Financieras'),),
 		);
 	}
 
@@ -148,6 +148,9 @@ class Financieras extends CActiveRecord
 		$criteria->with = array('responsables');
 		$criteria->compare('CONCAT(responsables.nombre, responsables.celular, responsables.email)',$this->responsablesBusqueda,true);
 		$criteria->together = true;
+		$criteria->with = array('productos');
+		$criteria->compare('CONCAT(productos.nombre, productos.descripcion)',$this->productosBusqueda,true);
+		$criteria->together = true;
 		/*
 		$criteria->with = array('productos');
 		$criteria->compare('CONCAT(productos.nombre, productos.descripcion)',$this->productosBusqueda,true);
@@ -155,7 +158,8 @@ class Financieras extends CActiveRecord
 		
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
-			'sort'=>array('attributes'=>array('responsablesBusqueda'=>array('asc'=>'responsables.nombre', 'desc'=>'responsables.nombre', ), '*', ), ),			
+			'sort'=>array('attributes'=>array('responsablesBusqueda'=>array('asc'=>'responsables.nombre', 'desc'=>'responsables.nombre', ), '*', ), ),
+			'sort'=>array('attributes'=>array('productosBusqueda'=>array('asc'=>'productos.nombre', 'desc'=>'productos.nombre', ), '*', ), ),
 		));
 	}
 }

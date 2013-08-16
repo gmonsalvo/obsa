@@ -28,7 +28,12 @@ $this->menu=array(
 		array(
 	       'label'=>'Responsables',
 	       'type'=>'raw',
-	       'value'=>$this->dibujarCeldaLista($model),
+	       'value'=>$this->dibujarCeldaResponsablesLista($model),
+        ),
+		array(
+	       'label'=>'Productos',
+	       'type'=>'raw',
+	       'value'=>$this->dibujarCeldaProductosLista($model),
         ),
 	),
 )); ?>

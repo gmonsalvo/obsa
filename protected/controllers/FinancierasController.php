@@ -8,7 +8,7 @@ class FinancierasController extends Controller
 	
 	////// Métodos generados
 	
-	protected function dibujarCeldaLista($data) 
+	protected function dibujarCeldaResponsablesLista($data) 
     {
     	$model = $this->loadModel($data->id);
 		
@@ -20,7 +20,7 @@ class FinancierasController extends Controller
 		return $contenido;
     }
 	 	
-	protected function dibujarCeldaGrilla($data) 
+	protected function dibujarCeldaResponsablesGrilla($data) 
     {
     	$model = $this->loadModel($data->id);
 		
@@ -32,6 +32,29 @@ class FinancierasController extends Controller
 		return $contenido;
     } 	
 		
+	protected function dibujarCeldaProductosLista($data) 
+    {
+    	$model = $this->loadModel($data->id);
+		
+		$contenido = '';
+		
+		foreach ($model->productos as $producto)
+			$contenido = $contenido.CHtml::encode($producto['nombre'].' - '.$producto['descripcion']).'<br>';
+		
+		return $contenido;
+    }
+	 	
+	protected function dibujarCeldaProductosGrilla($data) 
+    {
+    	$model = $this->loadModel($data->id);
+		
+		$contenido = '';
+		
+		foreach ($model->productos as $producto)
+			$contenido = $contenido.'<b>'.CHtml::encode($producto['nombre']).'</b><br>'.CHtml::encode($producto['descripcion']).'<br>';
+		
+		return $contenido;
+    } 	
 	
 	////// Métodos generados
 	
@@ -122,10 +145,38 @@ class FinancierasController extends Controller
 	        	}						
 			}
 			
-			$model->productos = $data;
+			$model->productos = array();
+			$model->productosFinanciera = array();
 			
-			if($model->save())
-				$this->redirect(array('view','id'=>$model->id));
+			$productos = $_POST['Financieras']['productosId'];
+			
+			$transaccion = Yii::app()->db->beginTransaction();
+			
+			if($model->save()) {
+				
+				$error = false;
+				
+				if ($productos)
+					foreach ($productos as $idproducto) {
+						$relacion = new Productoctacte();
+						$relacion->nombreModelo = 'Financieras';
+						$relacion->pkModeloRelacionado = $model->id;
+						$relacion->productoId = (int) $idproducto;
+				        $relacion->userStamp = Yii::app()->user->model->username;
+				        $relacion->timeStamp = Date("Y-m-d h:m:s");
+						if (!$relacion->save()) {
+							$error = true;
+							break;
+						}
+					}
+				
+				if (!$error) {
+					$transaccion->commit();
+					$this->redirect(array('view','id'=>$model->id));
+				}
+				else
+					$transaccion->rollBack();
+			}			
 		}
 
 		$this->render('create',array(
@@ -167,27 +218,36 @@ class FinancierasController extends Controller
 			*/
 			
 			$model->productos = array();
+			$model->productosFinanciera = array();
 			
 			$productos = $_POST['Financieras']['productosId'];
+			
+			$transaccion = Yii::app()->db->beginTransaction();
 			
 			if($model->save()) {
 				
 				$error = false;
 				
-				foreach ($productos as $idproducto) {
-					$relacion = new Productoctacte();
-					$relacion->nombreModelo = 'Financiera';
-					$relacion->pkModeloRelacionado = $model->id;
-					$relacion->productoId = (int) $idproducto;
-					if (!$relacion->save()) {
-						//$relacion->
-						$error = true;
-						break;
+				if ($productos)
+					foreach ($productos as $idproducto) {
+						$relacion = new Productoctacte();
+						$relacion->nombreModelo = 'Financieras';
+						$relacion->pkModeloRelacionado = $model->id;
+						$relacion->productoId = (int) $idproducto;
+				        $relacion->userStamp = Yii::app()->user->model->username;
+				        $relacion->timeStamp = Date("Y-m-d h:m:s");
+						if (!$relacion->save()) {
+							$error = true;
+							break;
+						}
 					}
-				}
 				
-				if (!$error)
+				if (!$error) {
+					$transaccion->commit();
 					$this->redirect(array('view','id'=>$model->id));
+				}
+				else
+					$transaccion->rollBack();
 			}
 		}
 
@@ -210,9 +270,14 @@ class FinancierasController extends Controller
 			$model->responsables = array();
 			
 			$model->productos = array();
+			$model->productosFinanciera = array();
 			
-			if ($model->save())
+			if ($model->save(false))
 				$model->delete();
+			else {
+				print_r($model->getErrors());
+				exit;
+			}
 
 			// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
 			if(!isset($_GET['ajax']))

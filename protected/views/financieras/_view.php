@@ -36,6 +36,16 @@
 			echo '<br>';
 		}
 	?>
+	
+	<b><?php echo CHtml::encode('Productos'); ?>:</b>
+	<br/>
+	<?php /*echo CHtml::encode($data->responsables->id);*/
+		foreach($data->productos as $producto) {
+			echo CHtml::encode($producto['nombre'].' - '.$producto['descripcion']);
+			echo '<br>';
+		}
+	?>
+	
 	<?php /*
 	<b><?php echo CHtml::encode($data->getAttributeLabel('userStamp')); ?>:</b>
 	<?php echo CHtml::encode($data->userStamp); ?>

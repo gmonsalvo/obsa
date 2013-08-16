@@ -44,6 +44,11 @@
 		<?php echo $form->label($model,'responsables'); ?>
 		<?php echo $form->textField($model,'responsablesBusqueda',array('size'=>45,'maxlength'=>45)); ?>
 	</div>
+	
+	<div class="row">
+		<?php echo $form->label($model,'productos'); ?>
+		<?php echo $form->textField($model,'productosBusqueda',array('size'=>45,'maxlength'=>45)); ?>
+	</div>
 	<!--
 	<div class="row">
 		<?php echo $form->label($model,'userStamp'); ?>
