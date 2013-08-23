@@ -4,9 +4,13 @@ class FinancierasController extends Controller
 {
 	////// Propiedades
 	
-	////// Métodos nuevos
+	/**
+	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
+	 * using two-column layout. See 'protected/views/layouts/column2.php'.
+	 */
+	public $layout='//layouts/column2';
 	
-	////// Métodos generados
+	////// Métodos nuevos
 	
 	protected function dibujarCeldaResponsablesLista($data) 
     {
@@ -58,12 +62,6 @@ class FinancierasController extends Controller
 	
 	////// Métodos generados
 	
-	/**
-	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
-	 * using two-column layout. See 'protected/views/layouts/column2.php'.
-	 */
-	public $layout='//layouts/column2';
-
 	/**
 	 * @return array action filters
 	 */
@@ -135,15 +133,6 @@ class FinancierasController extends Controller
 			}
 			
 			$model->responsables = $data;
-			
-			$data=array();
-			
-			if (isset($_POST['productosSeleccionados'])) {
-	        	$vect = $_POST['productosSeleccionados'];
-	        	foreach ($vect as $productoId) {
-	        		$data[] = (int) $productoId;
-	        	}						
-			}
 			
 			$model->productos = array();
 			$model->productosFinanciera = array();

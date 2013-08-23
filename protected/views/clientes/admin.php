@@ -1,13 +1,12 @@
 <?php
 $this->breadcrumbs=array(
-	'Clientes'=>array('admin')
-,
-
+	'Clientes'=>array('admin'),
+	'Administrar',
 );
 
 $this->menu=array
 (
-
+	//array('label'=>'Listar Clientes', 'url'=>array('index')),
 	array('label'=>'Nuevo Cliente', 'url'=>array('create')),
 
 );
@@ -26,13 +25,14 @@ $('.search-form form').submit(function(){
 ");
 ?>
 
-<h1>Listado de Clientes</h1>
+<h1>Administrar Clientes</h1>
 
+<!--
 <p>
 Ademas puede ingresar un operador de comparacion (<b>&lt;</b>, <b>&lt;=</b>, <b>&gt;</b>, <b>&gt;=</b>, <b>&lt;&gt;</b>
 o <b>=</b>) al comienzo de cada parametro de busqueda.
 </p>
-
+-->
 
 <?php echo CHtml::link('Busqueda Avanzada','#',array('class'=>'search-button')); ?>
 <div class="search-form" style="display:none">
@@ -93,6 +93,12 @@ function exportar(){
                 ? CHtml::tag("span", array("title"=>$data->operador->apynom), CHtml::encode(substr($data->operador->apynom, 0, 10)) . "..")
                 : CHtml::encode($data->operador->apynom)
             );',
+		),
+		array(
+			'header'=>'Productos',
+			'name'=>'productosBusqueda',
+			'type'=>'raw',
+			'value'=>array($this, 'dibujarCeldaProductosGrilla'),
 		),
 		array(
 			'class'=>'CButtonColumn',

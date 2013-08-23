@@ -85,6 +85,7 @@ return array(
                     'class' => 'CWebLogRoute',
                     'levels'=>'trace, info, error, warning',
                     'categories'=>'system.db.*',
+                    //'logFile' => 'db.log',
                     'showInFireBug'=>false //true/falsefirebug only - turn off otherwise
                     //'filter' => 'CLogFilter'
                 ),

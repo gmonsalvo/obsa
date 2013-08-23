@@ -24,6 +24,36 @@
  */
 class Ctacte extends CActiveRecord
 {
+	////// Propiedades
+	
+    // Tipos de movimientos
+
+    const TYPE_CREDITO = 0;
+    const TYPE_DEBITO = 1;
+
+    private $acum;
+    private $saldo;
+    public $total;
+    public $fechaInicio;
+    public $fechaFin;
+		
+	////// Métodos nuevos
+	
+    public function getSaldoAcumuladoActual(){
+        if(isset($this->productoCtaCteId)){
+            $criteria = new CDbCriteria();
+            $criteria->condition = "id IN (SELECT MAX(id) FROM ctacte WHERE productoCtaCteId=".$this->productoCtaCteId.")";
+            $model = $this->find($criteria);
+            if(isset($model))
+                return $model->saldoAcumulado;
+            else
+                return 0;
+        } else return 0;
+    }
+		
+	
+	////// Métodos generados
+	
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
@@ -71,6 +101,8 @@ class Ctacte extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'productoCtaCte' => array(self::BELONGS_TO, 'Productoctacte', 'productoCtaCteId'),
+            'concepto' => array(self::BELONGS_TO, 'Conceptos', 'conceptoId'),
+            'sucursal' => array(self::BELONGS_TO, 'Sucursales', 'sucursalId'),
 		);
 	}
 

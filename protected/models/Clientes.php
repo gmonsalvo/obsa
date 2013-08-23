@@ -30,10 +30,9 @@
  * @property OperacionesCheques[] $operacionesCheques
  */
 class Clientes extends CustomCActiveRecord {
-    /**
-     * Returns the static model of the specified AR class.
-     * @return Clientes the static model class
-     */
+
+    ////// Propiedades
+    
     const TYPE_TOMADOR=0;
     const TYPE_INVERSOR=1;
     const TYPE_TOMADOR_E_INVERSOR=2;
@@ -42,135 +41,27 @@ class Clientes extends CustomCActiveRecord {
     private $saldoColocaciones;
     private $montoColocaciones;
     private $porcentajeInversion;
+	public $productosBusqueda;
+	public $productosId;
 
-    public static function model($className=__CLASS__) {
-        return parent::model($className);
-    }
+	////// Métodos nuevos
 
-    /**
-     * @return string the associated database table name
-     */
-    public function tableName() {
-        return 'clientes';
-    }
-
-    /**
-     * @return array validation rules for model attributes.
-     */
-    public function rules() {
-        // NOTE: you should only define rules for those attributes that
-        // will receive user inputs.
-        return array(
-            array('razonSocial, documento, tipoCliente, tasaTomador,tasaInversor,operadorId, sucursalId, userStamp, timeStamp,direccion,fijo,celular', 'required'),
-            array('localidadId, provinciaId, tipoCliente, operadorId, sucursalId', 'numerical', 'integerOnly' => true),
-            array('razonSocial, fijo, celular, direccion, email', 'length', 'max' => 45),
-            array('documento', 'length', 'max' => 11),
-            array('tasaInversor, tasaTomador', 'length', 'max' => 5),
-            array('userStamp', 'length', 'max' => 50),
-            array('montoMaximoTomador, montoPermitidoDescubierto', 'length', 'max' => 15),
-            array('tasaInversor', 'validateTasas'),
-            array('documento','unique'),
-            array('razonSocial','unique'),
-            // The following rule is used by search().
-            // Please remove those attributes that should not be searched.
-            array('id, razonSocial, fijo, celular, direccion, localidadId, provinciaId, email, documento, tasaInversor, tipoCliente, operadorId, sucursalId, userStamp, timeStamp, tasaTomador, montoMaximoTomador', 'safe', 'on' => 'search'),
-        );
-    }
-
-    public function validateTasas($attribute, $params) {
-        switch ($this->tipoCliente) {
-            case self::TYPE_TOMADOR:
-                if ($this->tasaTomador == '')
-                    $this->addError($this->tasaTomador, 'Debe ingresar una tasa para el cliente tomador');
-                break;
-            case self::TYPE_INVERSOR:
-                if ($this->tasaInversor == '')
-                    $this->addError($this->tasaInversor, 'Debe ingresar una tasa para el cliente inversor');
-                break;
-            case self::TYPE_TOMADOR_E_INVERSOR:
-                if ($this->tasaTomador == '')
-                    $this->addError($this->tasaTomador, 'Debe ingresar una tasa para el cliente tomador');
-                if ($this->tasaInversor == '')
-                    $this->addError($this->tasaInversor, 'Debe ingresar una tasa para el cliente inversor');
-                break;
-            default;
-        }
-    }
-
-    /**
-     * @return array relational rules.
-     */
-    public function relations() {
-        // NOTE: you may need to adjust the relation name and the related
-        // class name for the relations automatically generated below.
-        return array(
-            'apoderados' => array(self::HAS_MANY, 'Apoderados', 'clienteId'),
-            'beneficiarios' => array(self::HAS_MANY, 'Beneficiarios', 'clienteId'),
-            'operador' => array(self::BELONGS_TO, 'Operadores', 'operadorId'),
-            'sucursal' => array(self::BELONGS_TO, 'Sucursales', 'sucursalId'),
-            'operacionesCheques' => array(self::HAS_MANY, 'OperacionesCheques', 'clienteId'),
-            'localidad' => array(self::BELONGS_TO, 'Localidades', 'localidadId'),
-            'provincia' => array(self::BELONGS_TO, 'Provincias', 'provinciaId'),
-        );
-    }
-
-    /**
-     * @return array customized attribute labels (name=>label)
-     */
-    public function attributeLabels() {
-        return array(
-            'id' => 'ID',
-            'razonSocial' => 'Razon Social',
-            'fijo' => 'Fijo',
-            'celular' => 'Celular',
-            'direccion' => 'Direccion',
-            'localidadId' => 'Localidad',
-            'provinciaId' => 'Provincia',
-            'email' => 'Email',
-            'documento' => 'DU/CUIT/CUIL',
-            'tasaInversor' => 'Tasa Inversor',
-            'tipoCliente' => 'Tipo Cliente',
-            'operadorId' => 'Operador',
-            'sucursalId' => 'Sucursal',
-            'userStamp' => 'User Stamp',
-            'timeStamp' => 'Time Stamp',
-            'tasaTomador' => 'Tasa Tomador',
-            'montoMaximoTomador' => 'Monto Maximo Tomador',
-        );
-    }
-
-    /**
-     * Retrieves a list of models based on the current search/filter conditions.
-     * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
-     */
-    public function search() {
-        // Warning: Please modify the following code to remove attributes that
-        // should not be searched.
-
-        $criteria = new CDbCriteria;
-        $criteria->compare('id', $this->id);
-        $criteria->compare('razonSocial', $this->razonSocial, true);
-        $criteria->compare('fijo', $this->fijo, true);
-        $criteria->compare('celular', $this->celular, true);
-        $criteria->compare('direccion', $this->direccion, true);
-        $criteria->compare('localidadId', $this->localidadId);
-        $criteria->compare('provinciaId', $this->provinciaId);
-        $criteria->compare('email', $this->email, true);
-        $criteria->compare('documento', $this->documento, true);
-        $criteria->compare('tasaInversor', $this->tasaInversor, true);
-        $criteria->compare('tipoCliente', $this->tipoCliente);
-        $criteria->compare('operadorId', $this->operadorId);
-        $criteria->compare('sucursalId', $this->sucursalId);
-        $criteria->compare('userStamp', $this->userStamp, true);
-        $criteria->compare('timeStamp', $this->timeStamp, true);
-        $criteria->compare('tasaTomador', $this->tasaTomador, true);
-        $criteria->compare('montoMaximoTomador', $this->montoMaximoTomador, true);
-
-        return new CActiveDataProvider($this, array(
-                    'criteria' => $criteria,
-                ));
-    }
-
+	public function behaviors()
+	{
+    	return array(
+        	'LoggableBehavior' => 'application.modules.auditTrail.behaviors.LoggableBehavior',
+            'activerecord-relation'=>array('class'=>'ext.yiiext.behaviors.activerecord-relation.EActiveRecordRelationBehavior',),
+    	);
+	}	
+	
+	public function beforeValidate()
+	{
+        $this->userStamp = Yii::app()->user->model->username;
+        $this->timeStamp = Date("Y-m-d h:m:s");
+		
+		return parent::beforeValidate();; 
+	}
+	
     public function searchInversoresParaColocacion($filtrarSaldoNegativo = false) {
         // Warning: Please modify the following code to remove attributes that
         // should not be searched.
@@ -341,6 +232,7 @@ class Clientes extends CustomCActiveRecord {
      * Obtiene cual es el porcentaje de tenencia de un inversor sobre un cheque colocado. Vale para la colocacion activa
      * @return float Porcentaje en numero
      */
+    
     public function getPorcentajeTenencia($chequeId=null, $clienteId, $colocacionId=null) {
         if (isset($clienteId)) {
             if (!isset($colocacionId)) {
@@ -410,5 +302,145 @@ class Clientes extends CustomCActiveRecord {
             $this->porcentajeInversion = $this->saldoColocaciones;
         return $this->porcentajeInversion;
     }
+	
+	////// Métodos generados	
 
+    /**
+     * Returns the static model of the specified AR class.
+     * @return Clientes the static model class
+     */
+	
+    public static function model($className=__CLASS__) {
+        return parent::model($className);
+    }
+
+    /**
+     * @return string the associated database table name
+     */
+    public function tableName() {
+        return 'clientes';
+    }
+
+    /**
+     * @return array validation rules for model attributes.
+     */
+    public function rules() {
+        // NOTE: you should only define rules for those attributes that
+        // will receive user inputs.
+        return array(
+            array('razonSocial, documento, tipoCliente, tasaTomador,tasaInversor,operadorId, sucursalId, userStamp, timeStamp,direccion,fijo,celular', 'required'),
+            array('localidadId, provinciaId, tipoCliente, operadorId, sucursalId', 'numerical', 'integerOnly' => true),
+            array('razonSocial, fijo, celular, direccion, email', 'length', 'max' => 45),
+            array('documento', 'length', 'max' => 11),
+            array('tasaInversor, tasaTomador', 'length', 'max' => 5),
+            array('userStamp', 'length', 'max' => 50),
+            array('montoMaximoTomador, montoPermitidoDescubierto', 'length', 'max' => 15),
+            array('tasaInversor', 'validateTasas'),
+            array('documento','unique'),
+            array('razonSocial','unique'),
+            // The following rule is used by search().
+            // Please remove those attributes that should not be searched.
+            array('id, razonSocial, fijo, celular, direccion, localidadId, provinciaId, email, documento, tasaInversor, tipoCliente, operadorId, sucursalId, userStamp, timeStamp, tasaTomador, montoMaximoTomador, productosBusqueda', 'safe', 'on' => 'search'),
+        );
+    }
+
+    public function validateTasas($attribute, $params) {
+        switch ($this->tipoCliente) {
+            case self::TYPE_TOMADOR:
+                if ($this->tasaTomador == '')
+                    $this->addError($this->tasaTomador, 'Debe ingresar una tasa para el cliente tomador');
+                break;
+            case self::TYPE_INVERSOR:
+                if ($this->tasaInversor == '')
+                    $this->addError($this->tasaInversor, 'Debe ingresar una tasa para el cliente inversor');
+                break;
+            case self::TYPE_TOMADOR_E_INVERSOR:
+                if ($this->tasaTomador == '')
+                    $this->addError($this->tasaTomador, 'Debe ingresar una tasa para el cliente tomador');
+                if ($this->tasaInversor == '')
+                    $this->addError($this->tasaInversor, 'Debe ingresar una tasa para el cliente inversor');
+                break;
+            default;
+        }
+    }
+
+    /**
+     * @return array relational rules.
+     */
+    public function relations() {
+        // NOTE: you may need to adjust the relation name and the related
+        // class name for the relations automatically generated below.
+        return array(
+            'apoderados' => array(self::HAS_MANY, 'Apoderados', 'clienteId'),
+            'beneficiarios' => array(self::HAS_MANY, 'Beneficiarios', 'clienteId'),
+            'operador' => array(self::BELONGS_TO, 'Operadores', 'operadorId'),
+            'sucursal' => array(self::BELONGS_TO, 'Sucursales', 'sucursalId'),
+            'operacionesCheques' => array(self::HAS_MANY, 'OperacionesCheques', 'clienteId'),
+            'localidad' => array(self::BELONGS_TO, 'Localidades', 'localidadId'),
+            'provincia' => array(self::BELONGS_TO, 'Provincias', 'provinciaId'),
+			'productosCliente' => array(self::HAS_MANY, 'Productoctacte', 'pkModeloRelacionado'),
+			'productos' => array(self::HAS_MANY, 'Productos', 'productoId', 'through'=>'productosCliente', 'condition' => 'productosCliente.nombreModelo=\'Clientes\''),
+        );
+    }
+
+    /**
+     * @return array customized attribute labels (name=>label)
+     */
+    public function attributeLabels() {
+        return array(
+            'id' => 'ID',
+            'razonSocial' => 'Razon Social',
+            'fijo' => 'Fijo',
+            'celular' => 'Celular',
+            'direccion' => 'Direccion',
+            'localidadId' => 'Localidad',
+            'provinciaId' => 'Provincia',
+            'email' => 'Email',
+            'documento' => 'DU/CUIT/CUIL',
+            'tasaInversor' => 'Tasa Inversor',
+            'tipoCliente' => 'Tipo Cliente',
+            'operadorId' => 'Operador',
+            'sucursalId' => 'Sucursal',
+            'userStamp' => 'User Stamp',
+            'timeStamp' => 'Time Stamp',
+            'tasaTomador' => 'Tasa Tomador',
+            'montoMaximoTomador' => 'Monto Maximo Tomador',
+        );
+    }
+
+    /**
+     * Retrieves a list of models based on the current search/filter conditions.
+     * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
+     */
+    public function search() {
+        // Warning: Please modify the following code to remove attributes that
+        // should not be searched.
+
+        $criteria = new CDbCriteria;
+        $criteria->compare('id', $this->id);
+        $criteria->compare('razonSocial', $this->razonSocial, true);
+        $criteria->compare('fijo', $this->fijo, true);
+        $criteria->compare('celular', $this->celular, true);
+        $criteria->compare('direccion', $this->direccion, true);
+        $criteria->compare('localidadId', $this->localidadId);
+        $criteria->compare('provinciaId', $this->provinciaId);
+        $criteria->compare('email', $this->email, true);
+        $criteria->compare('documento', $this->documento, true);
+        $criteria->compare('tasaInversor', $this->tasaInversor, true);
+        $criteria->compare('tipoCliente', $this->tipoCliente);
+        $criteria->compare('operadorId', $this->operadorId);
+        $criteria->compare('sucursalId', $this->sucursalId);
+        $criteria->compare('userStamp', $this->userStamp, true);
+        $criteria->compare('timeStamp', $this->timeStamp, true);
+        $criteria->compare('tasaTomador', $this->tasaTomador, true);
+        $criteria->compare('montoMaximoTomador', $this->montoMaximoTomador, true);
+		$criteria->with = array('productos');
+		$criteria->compare('CONCAT(productos.nombre, productos.descripcion)',$this->productosBusqueda,true);
+		$criteria->together = true;
+		
+        return new CActiveDataProvider($this, array(
+                    'criteria' => $criteria,
+                    'sort'=>array('attributes'=>array('productosBusqueda'=>array('asc'=>'productos.nombre', 'desc'=>'productos.nombre', ), '*', ), ),
+                ));
+    }
 }

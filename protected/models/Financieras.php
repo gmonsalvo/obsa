@@ -50,6 +50,7 @@ class Financieras extends CActiveRecord
 	}
 	
 	////// Métodos generados
+	
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
@@ -145,17 +146,15 @@ class Financieras extends CActiveRecord
 		$criteria->compare('tasaPesificacion',$this->tasaPesificacion,true);
 		$criteria->compare('userStamp',$this->userStamp,true);
 		$criteria->compare('timeStamp',$this->timeStamp,true);
-		$criteria->with = array('responsables');
+		$criteria->with = array('responsables', 'productos');
 		$criteria->compare('CONCAT(responsables.nombre, responsables.celular, responsables.email)',$this->responsablesBusqueda,true);
-		$criteria->together = true;
-		$criteria->with = array('productos');
 		$criteria->compare('CONCAT(productos.nombre, productos.descripcion)',$this->productosBusqueda,true);
 		$criteria->together = true;
 		/*
 		$criteria->with = array('productos');
 		$criteria->compare('CONCAT(productos.nombre, productos.descripcion)',$this->productosBusqueda,true);
-		$criteria->together = true;*/
-		
+		$criteria->together = true;
+		*/
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
 			'sort'=>array('attributes'=>array('responsablesBusqueda'=>array('asc'=>'responsables.nombre', 'desc'=>'responsables.nombre', ), '*', ), ),

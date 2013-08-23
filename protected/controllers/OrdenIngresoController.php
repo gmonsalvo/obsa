@@ -2,6 +2,198 @@
 
 class OrdenIngresoController extends Controller
 {
+	////// Propiedades
+	
+	////// Métodos nuevos
+	
+	//esta funcion actualiza la orden de pago y acrtedita los fondos en la cuenta corriente del cliente
+	//o tambien anula la orden dependiendo de la accion seleccionada por el usuario
+	public function actionUpdateOrden() {
+      if (isset($_POST["boton"]) && isset($_POST["ordenIngresoId"])) {
+            $id = $_POST["ordenIngresoId"];
+            $ordenIngreso = $this->loadModel($id);
+            try {
+                if ($_POST["boton"] == "Acreditar Fondos") {
+                    if($ordenIngreso->tipo == OrdenIngreso::TIPO_DEPOSITO){
+                    	$connection = Yii::app()->db;
+            			$transaction = $connection->beginTransaction();
+						
+						$productoCliente = Productoctacte::model()->find("pkModeloRelacionado=:clienteId AND productoId=:productoId AND nombreModelo=:nombreModelo", array(":clienteId" => $ordenIngreso->clienteId, ":productoId" => $ordenIngreso->productoId, ":nombreModelo" => "Clientes"));
+						
+						if (!$productoCliente)
+							return false;
+						
+	                    //metemos un credito en cuenta corriente para este cliente
+						$sql = "INSERT INTO ctacte
+	                            (tipoMov, productoCtaCteId, conceptoId, descripcion, monto, fecha, origen, identificadorOrigen, userStamp, timeStamp, sucursalId, saldoAcumulado)
+	                            VALUES (:tipoMov, :productoCtaCteId, :conceptoId, :descripcion, :monto, :fecha, :origen, :identificadorOrigen, :userStamp, :timeStamp, :sucursalId, :saldoAcumulado)";
+
+	                    $tipoMov = Ctacte::TYPE_CREDITO; //credito
+	                    $conceptoId = 9; //Ingreso de fondos
+	                    $descripcion = "Deposito Num.".$id;
+	                    $fecha = Date("Y-m-d");
+	                    $operacionRelacionada = "Acreditacion de Fondos";
+	                    $origen="OrdenIngreso";
+	                    $identificadorOrigen=$ordenIngreso->id;
+
+	                    $ctacte = new Ctacte();
+	                    $ctacte->productoCtaCteId=$productoCliente->id;
+	                    $saldoAcumuladoActual = $ctacte->getSaldoAcumuladoActual();
+	                    $saldoAcumulado=$saldoAcumuladoActual+$ordenIngreso->monto;
+	                    $userStamp = Yii::app()->user->model->username;
+	                    $timeStamp = date("Y-m-d h:m:s");
+	                    $sucursalId = Yii::app()->user->model->sucursalId;
+	                    $command = $connection->createCommand($sql);
+						$command->bindValue(":tipoMov", $tipoMov, PDO::PARAM_STR);
+	                    $command->bindValue(":conceptoId", $conceptoId, PDO::PARAM_STR);
+	                    $command->bindValue(":productoCtaCteId", $productoCliente->id, PDO::PARAM_STR);
+	                    $command->bindValue(":descripcion", $descripcion, PDO::PARAM_STR);
+	                    $command->bindValue(":monto", $ordenIngreso->monto, PDO::PARAM_STR);
+	                    $command->bindValue(":fecha", $fecha, PDO::PARAM_STR);
+	                    $command->bindValue(":origen", $origen, PDO::PARAM_STR);
+	                    $command->bindValue(":identificadorOrigen", $identificadorOrigen, PDO::PARAM_STR);
+	                    $command->bindValue(":saldoAcumulado", $saldoAcumulado, PDO::PARAM_STR);
+	                    $command->bindValue(":userStamp", $userStamp, PDO::PARAM_STR);
+	                    $command->bindValue(":timeStamp", $timeStamp, PDO::PARAM_STR);
+	                    $command->bindValue(":sucursalId", $sucursalId, PDO::PARAM_STR);
+	                    $command->execute();
+						//tenemos que meter un movimiento en la caja de operaciones sea cual sea tipo de ordeningreso
+						$flujoFondos=new FlujoFondos;
+						$flujoFondos->cuentaId='6'; // cajade oepracion
+						$flujoFondos->conceptoId='9'; // concepto para ingreso de fondos
+						$flujoFondos->descripcion='Ingreso de Fondos Orden Num'.$id;
+						$flujoFondos->tipoFlujoFondos=FlujoFondos::TYPE_CREDITO;
+						$flujoFondos->monto=$ordenIngreso->monto;
+						$flujoFondos->saldoAcumulado = $flujoFondos->getSaldoAcumuladoActual() + $flujoFondos->monto;
+						$flujoFondos->fecha=Date("d/m/Y");
+						$flujoFondos->origen='ordenIngreso';
+						$flujoFondos->identificadorOrigen=$id;
+						$flujoFondos->sucursalId = Yii::app()->user->model->sucursalId;
+						$flujoFondos->userStamp = Yii::app()->user->model->username;
+						$flujoFondos->timeStamp = Date("d/m/Y h:m:s");
+						$flujoFondos->save();
+
+						$ordenIngreso->estado = OrdenIngreso::ESTADO_PAGADA;
+                    	$ordenIngreso->save();
+
+						$transaction->commit();
+                	} else {
+                		if($ordenIngreso->tipo == OrdenIngreso::TIPO_PESIFICACION_INDIVIDUAL){
+							//cambio el estado del cheque a acreditado
+							$chequeId = $ordenIngreso->identificadorOrigen;
+							$cheque = Cheques::model()->findByPk($chequeId);
+							$tasaDescuento = (1-($ordenIngreso->monto/$cheque->montoOrigen))*100;
+							if(Pesificaciones::model()->AcreditarCheque($chequeId, $tasaDescuento)){
+								$ordenIngreso->estado = OrdenIngreso::ESTADO_PAGADA;
+                    			$ordenIngreso->save();
+							} else {
+								$this->redirect(array('admin'));
+							}
+							// Cheques::model()->updateByPk($ordenIngreso->identificadorOrigen, array("estado"=>Cheques::TYPE_ACREDITADO));
+                		}
+                	}
+	                $this->actionFinal($id);
+                } else {
+                    if ($_POST["boton"] == "Anular") {
+                        $ordenIngreso->estado = OrdenIngreso::ESTADO_ANULADA;
+                        $ordenIngreso->save();
+                        $ordenIngreso->unsetAttributes();
+                        Yii::app()->user->setFlash('success','Orden de Ingreso Anulada');
+						$this->render('/ordenIngreso/admin',array('model'=>$ordenIngreso));
+                    }
+                }
+            } catch (Exception $e) { // an exception is raised if a query fails
+                $transaction->rollBack();
+                print_r($e);
+            }
+        }
+    }
+
+	//funcion para imprimir un pdf con la orden de ingreso
+	 public function actionReciboPDF($id) {
+        $model = $this->loadModel($id);
+
+
+        $pdf = Yii::createComponent('application.extensions.tcpdf.ETcPdf', 'P', 'cm', 'A4', true, 'UTF-8');
+        $pdf->SetCreator(PDF_CREATOR);
+        $pdf->SetAuthor("CAPITAL ADVISORS");
+        $pdf->SetTitle("Recibo");
+        $pdf->SetKeywords("TCPDF, PDF, example, test, guide");
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AliasNbPages();
+        $pdf->AddPage();
+        $pdf->SetFont("times", "B", 12);
+        $pdf->Cell(0, 3, 'Recibo', 0, 1, 'C');
+        $pdf->Ln();
+
+        $html = 'Fecha: ' . $model->fecha . '
+                       <br/>
+                       <br/>
+                       Cliente: ' . $model->cliente->razonSocial . '
+                       <br/>
+                       <br/>
+                       Orden de Ingreso Nro: ' . $model->id . '
+                       <br/>
+                       <br/>
+                       Monto Total: ' . Utilities::MoneyFormat($model->monto) . '
+                       <br/>
+                       <br/>
+                       Monto Efectivo: ' . Utilities::MoneyFormat($model->monto) . '
+                       <br/>
+                       <br/>
+                       <br/>';
+
+        $pdf->writeHTML($html, true, false, true, false, '');
+        $pdf->Ln();
+        $pdf->writeHTML("---------------------------", true, false, false, false, "R");
+        $pdf->writeHTML("Recibi conforme", true, false, false, false, "R");
+        $pdf->Output($id . ".pdf", "I");
+    }
+
+	public function actionFinal($id)
+	{
+		$model = $this->loadModel($id);
+		$ejecutar = '<script type="text/javascript" language="javascript">
+		window.open("reciboPDF/'.$id.'");
+		</script>';
+		Yii::app()->session['ejecutar'] = $ejecutar;
+        Yii::app()->user->setFlash('success','Orden de Ingreso Procesada con exito');
+		$this->redirect(array('admin'));
+
+	}
+
+	public function actionLevantarCheque($id){
+		if($id){
+			$model = new OrdenIngreso;
+			$cheque = Cheques::model()->findByPk($id);
+			if($cheque===null)
+				throw new CHttpException(404,'The requested page does not exist.');
+			if(isset($_POST["OrdenIngreso"])){
+				$model->attributes=$_POST['OrdenIngreso'];
+				##calculo de nuevo el monto
+				$model->monto = $_POST["montoOrigen"] - ($_POST["porcentajeReconocimiento"] * $_POST["montoOrigen"] / 100);
+				$model->estado = OrdenIngreso::ESTADO_PENDIENTE;
+				$model->descripcion = "Orden Ingreso por cheque levandato num ". $model->identificadorOrigen;
+				$model->clienteId = $cheque->operacionCheque->clienteId;
+				$model->productoId = 1;
+				if($model->save()){
+				    Yii::app()->user->setFlash('success','Ingreso de Fondos realizado con exito');
+					$model->unsetAttributes();
+					$this->redirect(array('cheques/adminCheques'));
+				}
+
+			}
+			$this->render("levantarCheque",array("cheque"=>$cheque,"model"=>$model));
+		}
+	}
+
+	public function actionPrueba() {
+		$this->render("prueba",array("post"=>$_POST));
+	}
+	
+	////// Métodos generados
+	
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
 	 * using two-column layout. See 'protected/views/layouts/column2.php'.
@@ -35,7 +227,7 @@ class OrdenIngresoController extends Controller
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('admin','delete','updateOrden','reciboPDF','levantarCheque', "prueba"),
+				'actions'=>array('admin','delete','updateOrden','reciboPDF','levantarCheque', "prueba", "obtenerProductosCliente"),
 				'users'=>array('@'),
 			),
 			array('deny',  // deny all users
@@ -182,187 +374,4 @@ class OrdenIngresoController extends Controller
 			Yii::app()->end();
 		}
 	}
-
-
-	//esta funcion actualiza la orden de pago y acrtedita los fondos en la cuenta corriente del cliente
-	//o tambien anula la orden dependiendo de la accion seleccionada por el usuario
-	public function actionUpdateOrden() {
-      if (isset($_POST["boton"]) && isset($_POST["ordenIngresoId"])) {
-            $id = $_POST["ordenIngresoId"];
-            $ordenIngreso = $this->loadModel($id);
-            try {
-                if ($_POST["boton"] == "Acreditar Fondos") {
-                    if($ordenIngreso->tipo == OrdenIngreso::TIPO_DEPOSITO){
-                    	$connection = Yii::app()->db;
-            			$transaction = $connection->beginTransaction();
-	                    //metemos un credito en cuenta corriente para este cliente
-						$sql = "INSERT INTO ctacteClientes
-	                                            (tipoMov, conceptoId, clienteId, productoId, descripcion, monto, fecha, origen, identificadorOrigen, userStamp, timeStamp, sucursalId, saldoAcumulado)
-	                                            VALUES (:tipoMov, :conceptoId, :clienteId, :productoId, :descripcion, :monto, :fecha, :origen, :identificadorOrigen, :userStamp, :timeStamp, :sucursalId, :saldoAcumulado)";
-
-	                    $tipoMov = CtacteClientes::TYPE_CREDITO; //credito
-	                    $conceptoId = 9; //Ingreso de fondos
-	                    $descripcion = "Deposito Num.".$id;
-	                    $fecha = Date("Y-m-d");
-	                    $operacionRelacionada = "Acreditacion de Fondos";
-	                    $origen="OrdenIngreso";
-	                    $identificadorOrigen=$ordenIngreso->id;
-
-	                    $ctacteCliente = new CtacteClientes();
-	                    $ctacteCliente->clienteId=$ordenIngreso->clienteId;
-	                    $saldoAcumuladoActual = $ctacteCliente->getSaldoAcumuladoActual();
-	                    $saldoAcumulado=$saldoAcumuladoActual+$ordenIngreso->monto;
-	                    $userStamp = Yii::app()->user->model->username;
-	                    $timeStamp = date("Y-m-d h:m:s");
-	                    $sucursalId = Yii::app()->user->model->sucursalId;
-	                    $command = $connection->createCommand($sql);
-						$command->bindValue(":tipoMov", $tipoMov, PDO::PARAM_STR);
-	                    $command->bindValue(":conceptoId", $conceptoId, PDO::PARAM_STR);
-	                    $command->bindValue(":clienteId", $ordenIngreso->clienteId, PDO::PARAM_STR);
-	                    $command->bindValue(":productoId", $ordenIngreso->productoId, PDO::PARAM_STR);
-	                    $command->bindValue(":descripcion", $descripcion, PDO::PARAM_STR);
-	                    $command->bindValue(":monto", $ordenIngreso->monto, PDO::PARAM_STR);
-	                    $command->bindValue(":fecha", $fecha, PDO::PARAM_STR);
-	                    $command->bindValue(":origen", $origen, PDO::PARAM_STR);
-	                    $command->bindValue(":identificadorOrigen", $identificadorOrigen, PDO::PARAM_STR);
-	                    $command->bindValue(":saldoAcumulado", $saldoAcumulado, PDO::PARAM_STR);
-	                    $command->bindValue(":userStamp", $userStamp, PDO::PARAM_STR);
-	                    $command->bindValue(":timeStamp", $timeStamp, PDO::PARAM_STR);
-	                    $command->bindValue(":sucursalId", $sucursalId, PDO::PARAM_STR);
-	                    $command->execute();
-						//tenemos que meter un movimiento en la caja de operaciones sea cual sea tipo de ordeningreso
-						$flujoFondos=new FlujoFondos;
-						$flujoFondos->cuentaId='6'; // cajade oepracion
-						$flujoFondos->conceptoId='9'; // concepto para ingreso de fondos
-						$flujoFondos->descripcion='Ingreso de Fondos Orden Num'.$id;
-						$flujoFondos->tipoFlujoFondos=FlujoFondos::TYPE_CREDITO;
-						$flujoFondos->monto=$ordenIngreso->monto;
-						$flujoFondos->saldoAcumulado = $flujoFondos->getSaldoAcumuladoActual() + $flujoFondos->monto;
-						$flujoFondos->fecha=Date("d/m/Y");
-						$flujoFondos->origen='ordenIngreso';
-						$flujoFondos->identificadorOrigen=$id;
-						$flujoFondos->sucursalId = Yii::app()->user->model->sucursalId;
-						$flujoFondos->userStamp = Yii::app()->user->model->username;
-						$flujoFondos->timeStamp = Date("d/m/Y h:m:s");
-						$flujoFondos->save();
-
-						$ordenIngreso->estado = OrdenIngreso::ESTADO_PAGADA;
-                    	$ordenIngreso->save();
-
-						$transaction->commit();
-                	} else {
-                		if($ordenIngreso->tipo == OrdenIngreso::TIPO_PESIFICACION_INDIVIDUAL){
-							//cambio el estado del cheque a acreditado
-							$chequeId = $ordenIngreso->identificadorOrigen;
-							$cheque = Cheques::model()->findByPk($chequeId);
-							$tasaDescuento = (1-($ordenIngreso->monto/$cheque->montoOrigen))*100;
-							if(Pesificaciones::model()->AcreditarCheque($chequeId, $tasaDescuento)){
-								$ordenIngreso->estado = OrdenIngreso::ESTADO_PAGADA;
-                    			$ordenIngreso->save();
-							} else {
-								$this->redirect(array('admin'));
-							}
-							// Cheques::model()->updateByPk($ordenIngreso->identificadorOrigen, array("estado"=>Cheques::TYPE_ACREDITADO));
-                		}
-                	}
-	                $this->actionFinal($id);
-                } else {
-                    if ($_POST["boton"] == "Anular") {
-                        $ordenIngreso->estado = OrdenIngreso::ESTADO_ANULADA;
-                        $ordenIngreso->save();
-                        $ordenIngreso->unsetAttributes();
-                        Yii::app()->user->setFlash('success','Orden de Ingreso Anulada');
-						$this->render('/ordenIngreso/admin',array('model'=>$ordenIngreso));
-                    }
-                }
-            } catch (Exception $e) { // an exception is raised if a query fails
-                $transaction->rollBack();
-                print_r($e);
-            }
-        }
-    }
-
-	//funcion para imprimir un pdf con la orden de ingreso
-	 public function actionReciboPDF($id) {
-        $model = $this->loadModel($id);
-
-
-        $pdf = Yii::createComponent('application.extensions.tcpdf.ETcPdf', 'P', 'cm', 'A4', true, 'UTF-8');
-        $pdf->SetCreator(PDF_CREATOR);
-        $pdf->SetAuthor("CAPITAL ADVISORS");
-        $pdf->SetTitle("Recibo");
-        $pdf->SetKeywords("TCPDF, PDF, example, test, guide");
-        $pdf->setPrintHeader(false);
-        $pdf->setPrintFooter(false);
-        $pdf->AliasNbPages();
-        $pdf->AddPage();
-        $pdf->SetFont("times", "B", 12);
-        $pdf->Cell(0, 3, 'Recibo', 0, 1, 'C');
-        $pdf->Ln();
-
-        $html = 'Fecha: ' . $model->fecha . '
-                       <br/>
-                       <br/>
-                       Cliente: ' . $model->cliente->razonSocial . '
-                       <br/>
-                       <br/>
-                       Orden de Ingreso Nro: ' . $model->id . '
-                       <br/>
-                       <br/>
-                       Monto Total: ' . Utilities::MoneyFormat($model->monto) . '
-                       <br/>
-                       <br/>
-                       Monto Efectivo: ' . Utilities::MoneyFormat($model->monto) . '
-                       <br/>
-                       <br/>
-                       <br/>';
-
-        $pdf->writeHTML($html, true, false, true, false, '');
-        $pdf->Ln();
-        $pdf->writeHTML("---------------------------", true, false, false, false, "R");
-        $pdf->writeHTML("Recibi conforme", true, false, false, false, "R");
-        $pdf->Output($id . ".pdf", "I");
-    }
-
-	public function actionFinal($id)
-	{
-		$model = $this->loadModel($id);
-		$ejecutar = '<script type="text/javascript" language="javascript">
-		window.open("reciboPDF/'.$id.'");
-		</script>';
-		Yii::app()->session['ejecutar'] = $ejecutar;
-        Yii::app()->user->setFlash('success','Orden de Ingreso Procesada con exito');
-		$this->redirect(array('admin'));
-
-	}
-
-	public function actionLevantarCheque($id){
-		if($id){
-			$model = new OrdenIngreso;
-			$cheque = Cheques::model()->findByPk($id);
-			if($cheque===null)
-				throw new CHttpException(404,'The requested page does not exist.');
-			if(isset($_POST["OrdenIngreso"])){
-				$model->attributes=$_POST['OrdenIngreso'];
-				##calculo de nuevo el monto
-				$model->monto = $_POST["montoOrigen"] - ($_POST["porcentajeReconocimiento"] * $_POST["montoOrigen"] / 100);
-				$model->estado = OrdenIngreso::ESTADO_PENDIENTE;
-				$model->descripcion = "Orden Ingreso por cheque levandato num ". $model->identificadorOrigen;
-				$model->clienteId = $cheque->operacionCheque->clienteId;
-				$model->productoId = 1;
-				if($model->save()){
-				    Yii::app()->user->setFlash('success','Ingreso de Fondos realizado con exito');
-					$model->unsetAttributes();
-					$this->redirect(array('cheques/adminCheques'));
-				}
-
-			}
-			$this->render("levantarCheque",array("cheque"=>$cheque,"model"=>$model));
-		}
-	}
-
-	public function actionPrueba(){
-		$this->render("prueba",array("post"=>$_POST));
-	}
-
 }

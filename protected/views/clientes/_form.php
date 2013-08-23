@@ -1,3 +1,17 @@
+<script>
+	
+	function visibilidadElemento(idElemento) {
+		
+		var elemento = document.getElementById(idElemento);
+		
+		if (elemento.style.display == "")
+			elemento.style.display = "none";
+		else
+			elemento.style.display = "";
+	}
+	
+</script>
+
 <div class="form">
 
 <?php $form=$this->beginWidget('CActiveForm', array(
@@ -55,8 +69,6 @@
 		<?php echo $form->error($model,'email'); ?>
 	</div>
 
-	
-
 	<div class="row">
 		<?php echo $form->labelEx($model,'tipoCliente'); ?>
 		<?php echo $form->dropDownList($model,'tipoCliente', $model->getTypeOptions()); ?>
@@ -102,9 +114,38 @@
 		<?php echo $form->error($model,'operadorId'); ?>
 	</div>
 
+	<div class="row">
+		<?php echo $form->error($model,'productos'); ?>
+		<?php 
+			echo $form->labelEx($model,'productos');
+			echo CHtml::link('(Mostrar)', array(''), array('onclick'=>'visibilidadElemento(\'cargaProductos\'); return false;')); 
+		?>
+		
+		<div class="row" id="cargaProductos" style="width:100px; display:none;">
+		<?php
+			$model->refresh();
+			
+			$model->productosId = array();
+			
+			//print_r($model->productos);
+			
+			if ($model->productos) {
+				foreach($model->productos as $record)
+					if ($record)
+						$model->productosId[] = $record->id ;
+			}
+			
+			echo CHtml::activeCheckboxList(
+			  $model, 'productosId', 
+			  CHtml::listData(Productos::model()->findAll(), 'id', 'nombre')/*,
+			  array('template'=>'<li>{input} {label}</li>',  'class'=>'categoryFilter',)*/
+			);
+		?>
+		</div>
+	</div>	
 
 	<div class="row buttons">
-		<?php echo CHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
+		<?php echo CHtml::submitButton($model->isNewRecord ? 'Guardar' : 'Guardar Cambios'); ?>
 	</div>
 
 <?php $this->endWidget(); ?>

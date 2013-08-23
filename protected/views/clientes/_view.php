@@ -51,7 +51,7 @@
 	<b><?php echo CHtml::encode($data->getAttributeLabel('sucursalId')); ?>:</b>
 	<?php echo CHtml::encode($data->sucursalId); ?>
 	<br />
-
+	<!--
 	<b><?php echo CHtml::encode($data->getAttributeLabel('userStamp')); ?>:</b>
 	<?php echo CHtml::encode($data->userStamp); ?>
 	<br />
@@ -59,7 +59,7 @@
 	<b><?php echo CHtml::encode($data->getAttributeLabel('timeStamp')); ?>:</b>
 	<?php echo CHtml::encode($data->timeStamp); ?>
 	<br />
-
+	-->
 	<b><?php echo CHtml::encode($data->getAttributeLabel('tasaTomador')); ?>:</b>
 	<?php echo CHtml::encode($data->tasaTomador); ?>
 	<br />
@@ -68,4 +68,12 @@
 	<?php echo CHtml::encode($data->montoMaximoTomador); ?>
 	<br />
 
+	<b><?php echo CHtml::encode('Productos'); ?>:</b>
+	<br/>
+	<?php /*echo CHtml::encode($data->responsables->id);*/
+		foreach($data->productos as $producto) {
+			echo CHtml::encode($producto['nombre'].' - '.$producto['descripcion']);
+			echo '<br>';
+		}
+	?>
 </div>

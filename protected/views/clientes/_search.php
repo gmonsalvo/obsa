@@ -69,7 +69,7 @@
 		<?php echo $form->label($model,'sucursalId'); ?>
 		<?php echo $form->textField($model,'sucursalId'); ?>
 	</div>
-
+	<!--
 	<div class="row">
 		<?php echo $form->label($model,'userStamp'); ?>
 		<?php echo $form->textField($model,'userStamp',array('size'=>50,'maxlength'=>50)); ?>
@@ -79,7 +79,7 @@
 		<?php echo $form->label($model,'timeStamp'); ?>
 		<?php echo $form->textField($model,'timeStamp'); ?>
 	</div>
-
+	-->
 	<div class="row">
 		<?php echo $form->label($model,'tasaTomador'); ?>
 		<?php echo $form->textField($model,'tasaTomador',array('size'=>5,'maxlength'=>5)); ?>
@@ -88,6 +88,11 @@
 	<div class="row">
 		<?php echo $form->label($model,'montoMaximoTomador'); ?>
 		<?php echo $form->textField($model,'montoMaximoTomador',array('size'=>15,'maxlength'=>15)); ?>
+	</div>
+
+	<div class="row">
+		<?php echo $form->label($model,'productos'); ?>
+		<?php echo $form->textField($model,'productosBusqueda',array('size'=>45,'maxlength'=>45)); ?>
 	</div>
 
 	<div class="row buttons">

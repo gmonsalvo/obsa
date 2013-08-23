@@ -48,7 +48,12 @@ $this->menu=array(
 		),
 		'tasaTomador',
 		'montoMaximoTomador',
-                'montoPermitidoDescubierto'
+                'montoPermitidoDescubierto',
+		array(
+	       'label'=>'Productos',
+	       'type'=>'raw',
+	       'value'=>$this->dibujarCeldaProductosLista($model),
+        ),
 	),
 )); ?>
 
