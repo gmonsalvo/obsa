@@ -51,6 +51,17 @@ class Ctacte extends CActiveRecord
         } else return 0;
     }
 		
+    public function searchByFechaAndCliente($fechaIni, $fechaFin, $clienteId) {
+        $criteria = new CDbCriteria;
+        $criteria->condition = "(fecha BETWEEN :start_day AND :end_day) AND clienteId=:clienteId";
+        $criteria->order = 'fecha ASC';
+        $criteria->params = array(':start_day' => $fechaIni, ':end_day' => $fechaFin, ':clienteId' => $clienteId);
+
+        $dataProvider = new CActiveDataProvider(get_class($this), array(
+                    'criteria' => $criteria,
+                ));
+        return $dataProvider;
+    }
 	
 	////// Métodos generados
 	
@@ -101,6 +112,7 @@ class Ctacte extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'productoCtaCte' => array(self::BELONGS_TO, 'Productoctacte', 'productoCtaCteId'),
+			'cliente' => array(self::HAS_MANY, 'Clientes', 'clienteId', 'through'=>'productosCliente', 'condition' => 'productosCliente.nombreModelo=\'Clientes\''),
             'concepto' => array(self::BELONGS_TO, 'Conceptos', 'conceptoId'),
             'sucursal' => array(self::BELONGS_TO, 'Sucursales', 'sucursalId'),
 		);
@@ -115,6 +127,7 @@ class Ctacte extends CActiveRecord
 			'id' => 'ID',
 			'tipoMov' => 'Tipo Mov',
 			'productoCtaCteId' => 'Producto Cta Cte',
+			'producto' => 'Producto',
 			'conceptoId' => 'Concepto',
 			'descripcion' => 'Descripcion',
 			'monto' => 'Monto',
