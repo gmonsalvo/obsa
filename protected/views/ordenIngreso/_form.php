@@ -44,31 +44,52 @@
 	</div>
 
 	<div class="row">
-	<?php
-	echo $form->labelEx($model, 'clienteId');
-	$this->widget('EJuiAutoCompleteFkField', array(
-		  'model'=>$model, 
-		  'attribute'=>'clienteId', //the FK field (from CJuiInputWidget)
-		  // controller method to return the autoComplete data (from CJuiAutoComplete)
-		  'sourceUrl'=>Yii::app()->createUrl('/clientes/buscarRazonSocial'), 
-		  // defaults to false.  set 'true' to display the FK field with 'readonly' attribute.
-		  'showFKField'=>true,
-		   // display size of the FK field.  only matters if not hidden.  defaults to 10
-		  'FKFieldSize'=>15, 
-		  'relName'=>'cliente', // the relation name defined above
-		  'displayAttr'=>'razonSocial',  // attribute or pseudo-attribute to display
-		  // length of the AutoComplete/display field, defaults to 50
-		  'autoCompleteLength'=>40,
-		  // any attributes of CJuiAutoComplete and jQuery JUI AutoComplete widget may 
-		  // also be defined.  read the code and docs for all options
-		  'options'=>array(
-			  // number of characters that must be typed before 
-			  // autoCompleter returns a value, defaults to 2
-			  'minLength'=>1, 
-		  ),
-	 ));
-	 echo $form->error($model, 'clienteId');
-	?>
+	
+		<?php echo $form->labelEx($model,'clienteId'); ?>
+		<?php echo $form->textField($model,'clienteId',array('size'=>5,'maxlength'=>10,'readonly'=>true)); ?>
+        <?php echo CHtml::activeTextField($model,'nombreCliente',array('id'=>'nombreCliente' ,
+            'ajax'=>array(
+                'type'=>'POST',
+                'url'=>'../clientes/buscarNombreCliente',
+                'success' => 'js:function(data){
+                	var datos=jQuery.parseJSON(data);
+                	if (datos!="FALSE") {
+						clienteId = urlParam("clienteId"); 
+						alert("El Conductor existe, se tomaran sus datos");
+						var url = "update/"+datos.id+"/?licenciaId="+licenciaId;
+						$(location).attr("href",url);
+                	} 
+          		 }',
+            )
+           )); ?>
+		<?php echo $form->error($model,'nroDoc'); ?>
+		
+		<?php
+	  		/*
+			echo $form->labelEx($model, 'clienteId');
+			$this->widget('EJuiAutoCompleteFkField', array(
+				  'model'=>$model, 
+				  'attribute'=>'clienteId', //the FK field (from CJuiInputWidget)
+				  // controller method to return the autoComplete data (from CJuiAutoComplete)
+				  'sourceUrl'=>Yii::app()->createUrl('/clientes/buscarRazonSocial'), 
+				  // defaults to false.  set 'true' to display the FK field with 'readonly' attribute.
+				  'showFKField'=>true,
+				   // display size of the FK field.  only matters if not hidden.  defaults to 10
+				  'FKFieldSize'=>15, 
+				  'relName'=>'cliente', // the relation name defined above
+				  'displayAttr'=>'razonSocial',  // attribute or pseudo-attribute to display
+				  // length of the AutoComplete/display field, defaults to 50
+				  'autoCompleteLength'=>40,
+				  // any attributes of CJuiAutoComplete and jQuery JUI AutoComplete widget may 
+				  // also be defined.  read the code and docs for all options
+				  'options'=>array(
+					  // number of characters that must be typed before 
+					  // autoCompleter returns a value, defaults to 2
+					  'minLength'=>1, 
+				  ),
+			 ));
+			 echo $form->error($model, 'clienteId');*/
+		?>
 	</div>
 	
 

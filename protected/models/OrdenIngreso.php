@@ -26,6 +26,8 @@ class OrdenIngreso extends CustomCActiveRecord {
     const TIPO_DEPOSITO = 0;
     const TIPO_PESIFICACION_INDIVIDUAL = 1;
 
+	public $nombreCliente;
+
     /**
      * Returns the static model of the specified AR class.
      * @return OrdenIngreso the static model class
