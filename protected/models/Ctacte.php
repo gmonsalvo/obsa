@@ -36,6 +36,7 @@ class Ctacte extends CActiveRecord
     public $total;
     public $fechaInicio;
     public $fechaFin;
+	public $productoId;
 		
 	////// Métodos nuevos
 	
@@ -51,11 +52,11 @@ class Ctacte extends CActiveRecord
         } else return 0;
     }
 		
-    public function searchByFechaAndCliente($fechaIni, $fechaFin, $clienteId) {
+    public function searchByFechaAndCliente($fechaIni, $fechaFin, $productoCtaCteId) {
         $criteria = new CDbCriteria;
         $criteria->condition = "(fecha BETWEEN :start_day AND :end_day) AND clienteId=:clienteId";
         $criteria->order = 'fecha ASC';
-        $criteria->params = array(':start_day' => $fechaIni, ':end_day' => $fechaFin, ':clienteId' => $clienteId);
+        $criteria->params = array(':start_day' => $fechaIni, ':end_day' => $fechaFin, ':productoCtaCteId' => $productoCtaCteId);
 
         $dataProvider = new CActiveDataProvider(get_class($this), array(
                     'criteria' => $criteria,

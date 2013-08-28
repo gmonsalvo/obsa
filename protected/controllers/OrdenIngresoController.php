@@ -192,6 +192,14 @@ class OrdenIngresoController extends Controller
 		$this->render("prueba",array("post"=>$_POST));
 	}
 	
+	public function actionCargarProductosCliente() {
+		
+		$cliente = Clientes::model()->findByPk($_POST['OrdenIngreso']['clienteId']); //buscarProductosCliente($_POST['OrdenIngreso']['clienteId']);
+		
+		foreach($cliente->productos as $producto)
+			echo CHtml::tag('option', array('value'=>$producto->id),CHtml::encode($producto->nombre),true);
+	}
+	
 	////// Métodos generados
 	
 	/**
@@ -227,7 +235,7 @@ class OrdenIngresoController extends Controller
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('admin','delete','updateOrden','reciboPDF','levantarCheque', "prueba", "obtenerProductosCliente"),
+				'actions'=>array('admin','delete','updateOrden','reciboPDF','levantarCheque', "prueba", "cargarProductosCliente"),
 				'users'=>array('@'),
 			),
 			array('deny',  // deny all users

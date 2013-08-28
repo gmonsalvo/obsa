@@ -35,7 +35,7 @@ $('.search-form form').submit(function(){
 });
 ");
 
-Yii::app()->clientScript->registerScript('ponerFoco', '$("#'. CHtml::activeId($model,'clienteId') . '").focus();');
+Yii::app()->clientScript->registerScript('ponerFoco', '$("#'. CHtml::activeId($model,'productoCtaCteId') . '").focus();');
 
 ?>
 

@@ -44,28 +44,7 @@
 	</div>
 
 	<div class="row">
-	
-		<?php echo $form->labelEx($model,'clienteId'); ?>
-		<?php echo $form->textField($model,'clienteId',array('size'=>5,'maxlength'=>10,'readonly'=>true)); ?>
-        <?php echo CHtml::activeTextField($model,'nombreCliente',array('id'=>'nombreCliente' ,
-            'ajax'=>array(
-                'type'=>'POST',
-                'url'=>'../clientes/buscarNombreCliente',
-                'success' => 'js:function(data){
-                	var datos=jQuery.parseJSON(data);
-                	if (datos!="FALSE") {
-						clienteId = urlParam("clienteId"); 
-						alert("El Conductor existe, se tomaran sus datos");
-						var url = "update/"+datos.id+"/?licenciaId="+licenciaId;
-						$(location).attr("href",url);
-                	} 
-          		 }',
-            )
-           )); ?>
-		<?php echo $form->error($model,'nroDoc'); ?>
-		
 		<?php
-	  		/*
 			echo $form->labelEx($model, 'clienteId');
 			$this->widget('EJuiAutoCompleteFkField', array(
 				  'model'=>$model, 
@@ -87,8 +66,9 @@
 					  // autoCompleter returns a value, defaults to 2
 					  'minLength'=>1, 
 				  ),
+				  'onSelectScript'=>CHtml::ajax(array('type'=>'POST', 'url'=>array("ordenIngreso/cargarProductosCliente"), 'update'=>'#OrdenIngreso_productoId')),
 			 ));
-			 echo $form->error($model, 'clienteId');*/
+			 echo $form->error($model, 'clienteId');
 		?>
 	</div>
 	
@@ -99,7 +79,6 @@
                 array(
                     "model" => $model,
                     "attribute" => "monto",
-                   
                     ));
             ?>
 		<?php echo $form->error($model,'monto'); ?>
@@ -113,8 +92,7 @@
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'productoId'); ?>
-		<?php echo $form->dropDownList($model,'productoId',
-        CHtml::listData(Productos::model()->findAll(), 'id', 'nombre'),array('empty'=>'')); ?>
+		<?php echo $form->dropDownList($model, 'productoId', array(), array('empty' => 'Seleccionar un producto')) ?>
 		<?php echo $form->error($model,'productoId'); ?>
 	</div>
 

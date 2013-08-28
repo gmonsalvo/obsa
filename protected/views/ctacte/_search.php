@@ -72,6 +72,7 @@ $form=$this->beginWidget('CActiveForm', array(
               // autoCompleter returns a value, defaults to 2
               'minLength'=>1, 
           ),
+          'onSelectScript'=>CHtml::ajax(array('type'=>'POST', 'url'=>array("ctacte/cargarProductosCliente"), 'update'=>'#Ctacte_productoId')),
      ));
      ?>
 </div>
@@ -79,9 +80,11 @@ $form=$this->beginWidget('CActiveForm', array(
 	<?php 
 		echo $form->label($model,'producto');
 	?>
+	<?php echo $form->dropDownList($model, 'productoId', array(), array('empty' => 'Seleccionar un producto')) ?>
 	<?php
+		/*
 		echo CHtml::activeDropDownList($model->productoCtaCte,'productoId',
-		CHtml::listData(Productos::model()->findAll(),'id', 'nombre'),array('empty'=>'Seleccione un Producto'));
+		CHtml::listData(Productos::model()->findAll(),'id', 'nombre'),array('empty'=>'Seleccione un Producto'));*/
 	?>
 </div>
 <div class="row">
