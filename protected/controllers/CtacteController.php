@@ -6,7 +6,7 @@ class CtacteController extends Controller
 	
 	public function actionCargarProductosCliente() {
 		
-		$cliente = Clientes::model()->findByPk($_POST['Ctacte']['productoCtaCteId']);
+		$cliente = Clientes::model()->findByPk($_POST['Ctacte']['clienteId']);
 		
 		foreach($cliente->productos as $producto)
 			echo CHtml::tag('option', array('value'=>$producto->id),CHtml::encode($producto->nombre),true);
@@ -14,9 +14,10 @@ class CtacteController extends Controller
 	
     public function actionFiltrar() {
         if(isset($_GET)){
+        	exit();
             $model=new Ctacte();
-            $model->productoCtaCteId=$_GET["productoCtaCteId"];
-            $dataProvider=$model->searchByFechaAndCliente(Utilities::MysqlDateFormat($_GET["fechaIni"]),Utilities::MysqlDateFormat($_GET["fechaFin"]),$_GET["productoCtaCteId"]);
+            //$model->productoCtaCteId=$_GET["productoCtaCteId"];
+            $dataProvider=$model->searchByFechaAndCliente(Utilities::MysqlDateFormat($_GET["fechaIni"]),Utilities::MysqlDateFormat($_GET["fechaFin"]),$_GET["clienteId"],$_GET["productoId"]);
             $this->renderPartial('/ctacte/gridCtaCte', array('model' =>$model,
             'dataProvider' => $dataProvider,
         ));

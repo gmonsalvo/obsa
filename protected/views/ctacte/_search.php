@@ -43,25 +43,28 @@
 
 <?php
 
+
+
 $form=$this->beginWidget('CActiveForm', array(
 	'action'=>Yii::app()->createUrl($this->route),
 	'method'=>'get',
 ));
 ?>
+
   
 <div class="row">
-	<?php echo $form->label($model,'productoCtaCteId'); 
+	<?php echo $form->label($model,'clienteId'); 
 
 	$this->widget('EJuiAutoCompleteFkField', array(
           'model'=>$model, 
-          'attribute'=>'productoCtaCteId', //the FK field (from CJuiInputWidget)
+          'attribute'=>'clienteId', //the FK field (from CJuiInputWidget)
           // controller method to return the autoComplete data (from CJuiAutoComplete)
           'sourceUrl'=>Yii::app()->createUrl('/clientes/buscarRazonSocial'), 
           // defaults to false.  set 'true' to display the FK field with 'readonly' attribute.
           'showFKField'=>true,
            // display size of the FK field.  only matters if not hidden.  defaults to 10
           'FKFieldSize'=>15, 
-          'relName'=>'cliente', // the relation name defined above
+          'relName'=>'clienteId', // the relation name defined above
           'displayAttr'=>'razonSocial',  // attribute or pseudo-attribute to display
           // length of the AutoComplete/display field, defaults to 50
           'autoCompleteLength'=>40,
@@ -77,14 +80,11 @@ $form=$this->beginWidget('CActiveForm', array(
      ?>
 </div>
 <div class="row">
-	<?php 
-		echo $form->label($model,'producto');
-	?>
-	<?php echo $form->dropDownList($model, 'productoId', array(), array('empty' => 'Seleccionar un producto')) ?>
-	<?php
-		/*
-		echo CHtml::activeDropDownList($model->productoCtaCte,'productoId',
-		CHtml::listData(Productos::model()->findAll(),'id', 'nombre'),array('empty'=>'Seleccione un Producto'));*/
+		<?php echo $form->label($model,'productoId'); ?>
+		<?php echo $form->dropDownList($model, 'productoId', array(), array('empty' => 'Seleccionar un producto')) ?>
+<?php /*echo CHtml::activeDropDownList($model,'productoId',
+		CHtml::listData(Productos::model()->findAll(), 
+		'id', 'nombre'),array('empty'=>'Seleccione un Producto'));*/
 	?>
 </div>
 <div class="row">
