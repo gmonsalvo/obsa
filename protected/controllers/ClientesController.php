@@ -49,6 +49,7 @@ class ClientesController extends Controller {
 
     // data provider para el campo de autocompletado buscnado por razonSocial y tomando el clienteId
     public function actionBuscarRazonSocial() {
+    	
         $q = $_GET['term'];
         if (isset($q)) {
             $criteria = new CDbCriteria;
@@ -79,6 +80,19 @@ class ClientesController extends Controller {
                 echo "La consulta no devolvio resultados";
             }
         }
+    }
+
+    public function actionBuscarNombreCliente() {
+		
+		$model = $_POST["OrdenIngreso"];
+		
+        $criteria = new CDbCriteria;
+        $criteria->compare('razonSocial', $model["nombreCliente"], true);
+        $criteria->order = 'razonSocial'; // correct order-by field
+        $criteria->limit = 50;
+        $clientes = Clientes::model()->findAll($criteria);
+		
+		echo CJSON::encode($clientes);
     }
 
     public function actionGetInversoresDeCheque() {
@@ -395,7 +409,7 @@ class ClientesController extends Controller {
 //                'expression' => 'Yii::app()->user->checkAccess("usuario")',
 //            ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions' => array('create', 'update', 'admin', 'updatefield', 'delete', 'getCliente', 'getDataProvider', 'buscarRazonSocial', 'getSaldos', 'getInversoresDeCheque', 'ranking', 'informePosicion', 'getInforme', 'exportPDF', 'informePDF','exportarRanking','exportarLista'),
+                'actions' => array('create', 'update', 'admin', 'updatefield', 'delete', 'getCliente', 'getDataProvider', 'buscarRazonSocial', 'buscarNombreCliente', 'getSaldos', 'getInversoresDeCheque', 'ranking', 'informePosicion', 'getInforme', 'exportPDF', 'informePDF','exportarRanking','exportarLista'),
                 'users' => array('@'),
                 //'expression' => 'Yii::app()->user->checkAccess("administrador")',
             ),

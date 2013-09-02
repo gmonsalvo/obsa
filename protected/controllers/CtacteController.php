@@ -2,6 +2,30 @@
 
 class CtacteController extends Controller
 {
+	///// Métodos propios
+	
+	public function actionCargarProductosCliente() {
+		
+		$cliente = Clientes::model()->findByPk($_POST['Ctacte']['clienteId']);
+		
+		foreach($cliente->productos as $producto)
+			echo CHtml::tag('option', array('value'=>$producto->id),CHtml::encode($producto->nombre),true);
+	}
+	
+    public function actionFiltrar() {
+        if(isset($_GET)){
+        	exit();
+            $model=new Ctacte();
+            //$model->productoCtaCteId=$_GET["productoCtaCteId"];
+            $dataProvider=$model->searchByFechaAndCliente(Utilities::MysqlDateFormat($_GET["fechaIni"]),Utilities::MysqlDateFormat($_GET["fechaFin"]),$_GET["clienteId"],$_GET["productoId"]);
+            $this->renderPartial('/ctacte/gridCtaCte', array('model' =>$model,
+            'dataProvider' => $dataProvider,
+        ));
+        }
+    }
+	
+	///// Métodos generados
+		
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
 	 * using two-column layout. See 'protected/views/layouts/column2.php'.
@@ -31,7 +55,7 @@ class CtacteController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update','admin','delete'),
+				'actions'=>array('create','update','admin','delete','cargarProductosCliente','filtrar'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -138,6 +162,25 @@ class CtacteController extends Controller
 	 */
 	public function actionAdmin()
 	{
+        $model = new Ctacte('search');
+        $model->unsetAttributes();  // clear any default values
+        if (isset($_GET['Ctacte'])){
+            $model->attributes = $_GET['Ctacte'];
+            if (isset($_GET['fechaInicio'])){
+                $model->fechaInicio=date('Y-m-d', CDateTimeParser::parse($_GET['fechaInicio'], 'dd/MM/yyyy'));
+                $model->fechaFin=date('Y-m-d', CDateTimeParser::parse($_GET['fechaFin'], 'dd/MM/yyyy'));
+            }else {
+                $model->fechaInicio=date('Y-m-d', CDateTimeParser::parse($model->fechaInicio, 'dd/MM/yyyy'));
+                $model->fechaFin=date('Y-m-d', CDateTimeParser::parse($model->fechaFin, 'dd/MM/yyyy'));
+            }
+
+          }  
+        
+        $this->render('admin', array(
+            'model' => $model,
+        ));
+		
+		/*
 		$model=new Ctacte('search');
 		$model->unsetAttributes();  // clear any default values
 		if(isset($_GET['Ctacte']))
@@ -146,6 +189,7 @@ class CtacteController extends Controller
 		$this->render('admin',array(
 			'model'=>$model,
 		));
+		*/
 	}
 
 	/**

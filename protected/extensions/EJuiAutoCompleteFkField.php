@@ -150,6 +150,11 @@ class EJuiAutoCompleteFkField extends CJuiAutoComplete {
 	public $autoCompleteLength = 50;
 
 	/**
+	 *@var javascript to execute once a value is selected 
+	 */
+	public $onSelectScript;
+
+	/**
 	 * @var string the name of the FK field
 	 */
 	private $_fieldName;
@@ -168,7 +173,7 @@ class EJuiAutoCompleteFkField extends CJuiAutoComplete {
 	 * @var string the initial display value
 	 */
 	private $_display;
-
+	
     public function init() {
 		parent::init(); // ensure assets are published
 		
@@ -184,7 +189,10 @@ class EJuiAutoCompleteFkField extends CJuiAutoComplete {
 
         if (!isset($this->options['maxHeight']))
             $this->options['maxHeight']='100';
-
+		
+		if (!isset($this->onSelectScript))
+			$this->onSelectScript = '';
+		
         $this->htmlOptions['size'] = $this->autoCompleteLength;
         // fix problem with Chrome 10 validating maxLength for the auto-complete field
         $this->htmlOptions['maxLength'] = $this->autoCompleteLength;        
@@ -194,7 +202,7 @@ class EJuiAutoCompleteFkField extends CJuiAutoComplete {
         // setup javascript to do the work
         $this->options['create']="js:function(event, ui){\$(this).val('".$this->_display."');}";  // show initial display value
         // after user picks from list, save the ID in model/attr field, and Value in _save field for redisplay
-        $this->options['select']="js:function(event, ui){\$('#".$this->_fieldName."').val(ui.item.id);\$('#".$this->_saveName."').val(ui.item.value);}";
+        $this->options['select']="js:function(event, ui){\$('#".$this->_fieldName."').val(ui.item.id);\$('#".$this->_saveName."').val(ui.item.value);".$this->onSelectScript."}";
         // when the autoComplete field loses focus, refresh the field with current value of _save
         // this is either the previous value if user didn't pick anything; or the new value if they did
         $this->htmlOptions['onblur']="$(this).val($('#".$this->_saveName."').val());";

@@ -56,7 +56,7 @@
                                     array('label' => 'Adm. Clientes', 'url' => array('/clientes/admin')),
                                     array('label' => 'Ingreso de Fondos', 'url' => array('/ordenIngreso/create')),
                                     array('label' => 'Retiro de Fondos', 'url' => array('/ordenesPago/retirarFondos')),
-                                    array('label' => 'Cuentas Corrientes Clientes', 'url' => array('/ctacteClientes/admin')),
+                                    array('label' => 'Cuentas Corrientes Clientes', 'url' => array('/ctacte/admin')),
                                     array('label' => 'Informe Posicion', 'url' => array('/clientes/informePosicion')),
 
                                 ),

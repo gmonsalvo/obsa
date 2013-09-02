@@ -36,7 +36,11 @@ class Ctacte extends CActiveRecord
     public $total;
     public $fechaInicio;
     public $fechaFin;
-		
+	public $productoId;
+	public $clienteId;
+	public $productoCtaCteBusqueda;
+	public $nombreModelo;
+	
 	////// Métodos nuevos
 	
     public function getSaldoAcumuladoActual(){
@@ -51,11 +55,11 @@ class Ctacte extends CActiveRecord
         } else return 0;
     }
 		
-    public function searchByFechaAndCliente($fechaIni, $fechaFin, $clienteId) {
+    public function searchByFechaAndCliente($fechaIni, $fechaFin, $productoCtaCteId) {
         $criteria = new CDbCriteria;
         $criteria->condition = "(fecha BETWEEN :start_day AND :end_day) AND clienteId=:clienteId";
         $criteria->order = 'fecha ASC';
-        $criteria->params = array(':start_day' => $fechaIni, ':end_day' => $fechaFin, ':clienteId' => $clienteId);
+        $criteria->params = array(':start_day' => $fechaIni, ':end_day' => $fechaFin, ':productoCtaCteId' => $productoCtaCteId);
 
         $dataProvider = new CActiveDataProvider(get_class($this), array(
                     'criteria' => $criteria,
@@ -150,9 +154,26 @@ class Ctacte extends CActiveRecord
 	{
 		// Warning: Please modify the following code to remove attributes that
 		// should not be searched.
+		
+		if (isset($_GET['Ctacte']['clienteId']))
+			$this->clienteId = $_GET['Ctacte']['clienteId'];
+		if (isset($_GET['Ctacte']['productoId']))
+			$this->productoId = $_GET['Ctacte']['productoId'];
+		if (isset($_GET['Ctacte']['fechaInicio']))
+			$this->fechaInicio = Utilities::MysqlDateFormat($_GET['Ctacte']['fechaInicio']);
+		if (isset($_GET['Ctacte']['fechaFin']))
+			$this->fechaFin = Utilities::MysqlDateFormat($_GET['Ctacte']['fechaFin']);
+		
+       	$criteria = new CDbCriteria;
+     
+        $criteria->addBetweenCondition('fecha',$this->fechaInicio,$this->fechaFin);
+		$criteria->with = array('productoCtaCte');
+		$criteria->compare('productoCtaCte.pkModeloRelacionado',$this->clienteId);
+		$criteria->compare('productoCtaCte.productoId',$this->productoId);
+		$criteria->compare('productoCtaCte.nombreModelo',$this->nombreModelo);
+		$criteria->together = true;
 
-		$criteria=new CDbCriteria;
-
+		/*
 		$criteria->compare('id',$this->id);
 		$criteria->compare('tipoMov',$this->tipoMov);
 		$criteria->compare('productoCtaCteId',$this->productoCtaCteId,true);
@@ -167,9 +188,7 @@ class Ctacte extends CActiveRecord
 		$criteria->compare('userStamp',$this->userStamp,true);
 		$criteria->compare('timeStamp',$this->timeStamp,true);
 		$criteria->compare('sucursalId',$this->sucursalId);
-
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-		));
+		*/
+        return new CActiveDataProvider(get_class($this), array('criteria' => $criteria, 'pagination' => false, ));		
 	}
 }

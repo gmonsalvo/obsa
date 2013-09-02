@@ -44,31 +44,32 @@
 	</div>
 
 	<div class="row">
-	<?php
-	echo $form->labelEx($model, 'clienteId');
-	$this->widget('EJuiAutoCompleteFkField', array(
-		  'model'=>$model, 
-		  'attribute'=>'clienteId', //the FK field (from CJuiInputWidget)
-		  // controller method to return the autoComplete data (from CJuiAutoComplete)
-		  'sourceUrl'=>Yii::app()->createUrl('/clientes/buscarRazonSocial'), 
-		  // defaults to false.  set 'true' to display the FK field with 'readonly' attribute.
-		  'showFKField'=>true,
-		   // display size of the FK field.  only matters if not hidden.  defaults to 10
-		  'FKFieldSize'=>15, 
-		  'relName'=>'cliente', // the relation name defined above
-		  'displayAttr'=>'razonSocial',  // attribute or pseudo-attribute to display
-		  // length of the AutoComplete/display field, defaults to 50
-		  'autoCompleteLength'=>40,
-		  // any attributes of CJuiAutoComplete and jQuery JUI AutoComplete widget may 
-		  // also be defined.  read the code and docs for all options
-		  'options'=>array(
-			  // number of characters that must be typed before 
-			  // autoCompleter returns a value, defaults to 2
-			  'minLength'=>1, 
-		  ),
-	 ));
-	 echo $form->error($model, 'clienteId');
-	?>
+		<?php
+			echo $form->labelEx($model, 'clienteId');
+			$this->widget('EJuiAutoCompleteFkField', array(
+				  'model'=>$model, 
+				  'attribute'=>'clienteId', //the FK field (from CJuiInputWidget)
+				  // controller method to return the autoComplete data (from CJuiAutoComplete)
+				  'sourceUrl'=>Yii::app()->createUrl('/clientes/buscarRazonSocial'), 
+				  // defaults to false.  set 'true' to display the FK field with 'readonly' attribute.
+				  'showFKField'=>true,
+				   // display size of the FK field.  only matters if not hidden.  defaults to 10
+				  'FKFieldSize'=>15, 
+				  'relName'=>'cliente', // the relation name defined above
+				  'displayAttr'=>'razonSocial',  // attribute or pseudo-attribute to display
+				  // length of the AutoComplete/display field, defaults to 50
+				  'autoCompleteLength'=>40,
+				  // any attributes of CJuiAutoComplete and jQuery JUI AutoComplete widget may 
+				  // also be defined.  read the code and docs for all options
+				  'options'=>array(
+					  // number of characters that must be typed before 
+					  // autoCompleter returns a value, defaults to 2
+					  'minLength'=>1, 
+				  ),
+				  'onSelectScript'=>CHtml::ajax(array('type'=>'POST', 'url'=>array("ordenIngreso/cargarProductosCliente"), 'update'=>'#OrdenIngreso_productoId')),
+			 ));
+			 echo $form->error($model, 'clienteId');
+		?>
 	</div>
 	
 
@@ -78,7 +79,6 @@
                 array(
                     "model" => $model,
                     "attribute" => "monto",
-                   
                     ));
             ?>
 		<?php echo $form->error($model,'monto'); ?>
@@ -92,8 +92,7 @@
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'productoId'); ?>
-		<?php echo $form->dropDownList($model,'productoId',
-        CHtml::listData(Productos::model()->findAll(), 'id', 'nombre'),array('empty'=>'')); ?>
+		<?php echo $form->dropDownList($model, 'productoId', array(), array('empty' => 'Seleccionar un producto')) ?>
 		<?php echo $form->error($model,'productoId'); ?>
 	</div>
 

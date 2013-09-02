@@ -17,6 +17,23 @@
  */
 class Productoctacte extends CActiveRecord
 {
+	///// Métodos nuevos
+	
+	public function buscarProductosCliente($clienteId) {
+        // Warning: Please modify the following code to remove attributes that
+        // should not be searched.
+
+        $criteria = new CDbCriteria;
+
+        $criteria->compare('clienteId', $clienteId);
+
+        return new CActiveDataProvider($this, array(
+                    'criteria' => $criteria,
+                ));
+    }
+	
+	///// Métodos generados
+	
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
