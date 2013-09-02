@@ -61,6 +61,17 @@
 
                                 ),
                             ),
+                            array('label' => 'Financieras', 'url' => array(''),
+                                'items' => array(
+                                    array('label' => 'Adm. Financieras', 'url' => array('/financieras/admin')),
+                                    array('label' => 'Depositos', 'url' => array('/ctacteProveedores/create')),
+                                    array('label' => 'Retiros', 'url' => array('/ctacteProveedores/admin')),
+                                    array('label' => 'Cuenta Corriente', 'url' => array('/ordenesPagoProveedores/create')),
+                                    array('label' => 'Conciliacion Diaria', 'url' => array('/ordenesPagoProveedores/create')),
+                                    array('label' => 'Acreditaciones de Inversiones', 'url' => array('/ordenesPagoProveedores/create')),
+                                    array('label' => 'Envio/Recepcion Fisicos', 'url' => array('/ordenesPagoProveedores/create')),
+                                ),
+                            ),
                             array('label' => 'Operatoria Cheques', 'url' => array(''),
                                 'items' => array(
                                     array('label' => 'Compra de cheques corrientes y a fecha.', 'url' => array('/operacionesCheques/nuevaOperacion')),
@@ -79,14 +90,7 @@
                                     array('label' => 'Compra/Venta', 'url' => array('/operacionesCambio/create')),
                                 ),
                             ),
-                            array('label' => 'Proveedores', 'url' => array(''),
-                                'items' => array(
-                                    array('label' => 'Adm. Proveedores', 'url' => array('/proveedores/admin')),
-                                    array('label' => 'Nuevo Movimiento Proveedores', 'url' => array('/ctacteProveedores/create')),
-                                    array('label' => 'CtaCte Proveedores', 'url' => array('/ctacteProveedores/admin')),
-                                    array('label' => 'Ordenes de Pago', 'url' => array('/ordenesPagoProveedores/create')),
-                                ),
-                            ),
+                            
                             array('label' => 'Tesoreria', 'url' => array(''),
                                 'items' => array(
                                     array('label' => 'Mayores de Cuentas', 'url' => array('/flujoFondos/admin')),
