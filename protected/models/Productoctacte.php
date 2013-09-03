@@ -31,7 +31,7 @@ class Productoctacte extends CActiveRecord
                     'criteria' => $criteria,
                 ));
     }
-	
+
 	///// Métodos generados
 	
 	/**

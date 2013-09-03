@@ -28,6 +28,7 @@ class OrdenesPago extends CustomCActiveRecord {
 
     private $saldo;
     private $montoCheques;
+	public $productoId;
     /**
      * Returns the static model of the specified AR class.
      * @return OrdenesPago the static model class

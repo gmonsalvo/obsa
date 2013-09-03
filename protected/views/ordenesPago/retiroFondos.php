@@ -43,7 +43,7 @@ $this->menu = array(
         if($("#OrdenesPago_clienteId").val()==""){
             return false;
         } else {
-            $.post("/capadv/index.php/clientes/getSaldos?render=false",{"id":$("#OrdenesPago_clienteId").val()},function(data){
+            $.post("/obsa/index.php/clientes/getSaldos?render=false",{"id":$("#OrdenesPago_clienteId").val(), "productoId":$("#OrdenesPago_productoId").val()},function(data){
             if(data==""){
                 $(".oculto").css("display","none");
                 $("#botonSubmit").attr("disabled","disabled");
@@ -133,13 +133,14 @@ $this->menu = array(
 //            'javascript' => "alert('holaaa');",
             // any attributes of CJuiAutoComplete and jQuery JUI AutoComplete widget may
             // also be defined.  read the code and docs for all options
-            'select' => "MostrarInformacion()",
+            //'select' => "MostrarInformacion()",
             'options' => array(
                 // number of characters that must be typed before
                 // autoCompleter returns a value, defaults to 2
                 'minLength' => 1,
 
             ),
+            'onSelectScript'=>CHtml::ajax(array('type'=>'POST', 'url'=>array("ordenesPago/cargarProductosCliente"), 'update'=>'#OrdenesPago_productoId')),
         ));
         echo $form->error($model, 'clienteId');
         echo CHtml::ajaxButton('Mostrar informacion', CHtml::normalizeUrl(array('clientes/getSaldos', 'render' => false)), array(
@@ -172,6 +173,12 @@ $this->menu = array(
         ))
         ?>
     </div>
+
+	<div class="row">
+		<?php echo $form->labelEx($model,'productoId'); ?>
+		<?php echo $form->dropDownList($model, 'productoId', array(), array('empty' => 'Seleccionar un producto')) ?>
+		<?php echo $form->error($model,'productoId'); ?>
+	</div>
 
     <div class="row">
         <?php echo $form->labelEx($model, 'descripcion'); ?>

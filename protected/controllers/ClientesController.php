@@ -25,7 +25,9 @@ class ClientesController extends Controller {
 
     public function actionGetSaldos() {
         if (isset($_POST['id'])) {
+			
             $cliente = $this->loadModel($_POST['id']);
+			$cliente->productosId = $_POST['productoId'];
 
             if ($cliente != null) {
                 $datos=array(

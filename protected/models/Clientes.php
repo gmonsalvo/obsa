@@ -152,12 +152,19 @@ class Clientes extends CustomCActiveRecord {
         return $options[$this->tipoCliente];
     }
 
-    public function getSaldo() {
+	public function getSaldo() {
 
-           $ctaCte=new CtacteClientes;
-           $ctaCte->clienteId=$this->id;
-//            $ctaCte->productoId=0;
-            $this->saldo=$ctaCte->getSaldoAcumuladoActual();
+			$productoCliente = Productoctacte::model()->find("pkModeloRelacionado=:clienteId AND productoId=:productoId AND nombreModelo=:nombreModelo", array(":clienteId" => $this->id, ":productoId" => $this->productosId, ":nombreModelo" => "Clientes"));
+			
+			if (!$productoCliente)
+				return false;
+
+           $ctaCte=new Ctacte();
+		   $ctaCte->productoCtaCteId=$productoCliente->id;
+           //$ctaCte->clienteId=$this->id;
+		   //$ctaCte->productoId=0;
+           $this->saldo=$ctaCte->getSaldoAcumuladoActual();
+		   
         // $creditoSQL = "SELECT SUM(monto) FROM ctacteClientes WHERE clienteId='" . $this->id . "' AND tipoMov=0 AND productoId=1 AND sucursalId=" . Yii::app()->user->model->sucursalId;
         // $creditoQRY = Yii::app()->db->createCommand($creditoSQL)->queryScalar();
         // $debitoSQL = "SELECT SUM(monto) FROM ctacteClientes WHERE clienteId='" . $this->id . "' AND tipoMov=1 AND productoId=1 AND sucursalId=" . Yii::app()->user->model->sucursalId;

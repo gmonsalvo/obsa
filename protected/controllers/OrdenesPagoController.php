@@ -2,6 +2,22 @@
 
 class OrdenesPagoController extends Controller {
 
+	///// Propiedades
+	
+	///// Métodos nuevos
+	
+	public function actionCargarProductosCliente() {
+		
+		$cliente = Clientes::model()->findByPk($_POST['OrdenesPago']['clienteId']); //buscarProductosCliente($_POST['OrdenIngreso']['clienteId']);
+		
+		foreach($cliente->productos as $producto)
+			echo CHtml::tag('option', array('value'=>$producto->id),CHtml::encode($producto->nombre),true);
+		
+		echo '<script> MostrarInformacion(); </script>';
+	}
+	
+	///// Métodos Generados
+
     /**
      * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
      * using two-column layout. See 'protected/views/layouts/column2.php'.
@@ -29,7 +45,7 @@ class OrdenesPagoController extends Controller {
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions' => array('create', 'update', 'admin', 'getDetalles', 'updateOrden', 'reciboPDF', 'retirarFondos', 'final'),
+                'actions' => array('create', 'update', 'admin', 'getDetalles', 'updateOrden', 'reciboPDF', 'retirarFondos', 'final', 'cargarProductosCliente'),
                 'users' => array('@'),
             ),
             array('allow', // allow admin user to perform 'admin' and 'delete' actions
