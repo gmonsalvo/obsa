@@ -102,7 +102,7 @@
 			echo CHtml::link('(Mostrar)', array(''), array('onclick'=>'visibilidadElemento(\'cargaProductos\'); return false;')); 
 		?>
 		
-		<div class="row" id="cargaProductos" style="width:100px; display:none;">
+		<div class="row" id="cargaProductos" style="width:300px; display:none;">
 		<?php
 			$model->refresh();
 			
@@ -118,8 +118,8 @@
 			
 			echo CHtml::activeCheckboxList(
 			  $model, 'productosId', 
-			  CHtml::listData(Productos::model()->findAll(), 'id', 'nombre')/*,
-			  array('template'=>'<li>{input} {label}</li>',  'class'=>'categoryFilter',)*/
+			  CHtml::listData(Productos::model()->findAll(), 'id', 'nombre'),
+			  array('labelOptions'=>array('style'=>'display: inline;'))
 			);
 		?>
 		</div>

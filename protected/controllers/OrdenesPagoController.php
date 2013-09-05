@@ -448,6 +448,11 @@ class OrdenesPagoController extends Controller {
                     } else {
                         if ($ordenesPago->origenOperacion == OrdenesPago::ORIGEN_OPERACION_RETIRO_FONDOS) {
                             //
+                            $productoCliente = Productoctacte::model()->find("pkModeloRelacionado=:clienteId AND productoId=:productoId AND nombreModelo=:nombreModelo", array(":clienteId" => $ordenesPago->clienteId, ":productoId" => $ordenesPago->productoId, ":nombreModelo" => "Clientes"));
+						
+							if (!$productoCliente)
+								throw new Exception("Error al obtener la relación producto-cliente", 1);
+                            
                             $flujoFondos = new FlujoFondos;
                             $flujoFondos->cuentaId = '6'; // corresponde a la caja de operaciones
                             $flujoFondos->conceptoId = '16'; // pago prov
@@ -469,9 +474,9 @@ class OrdenesPagoController extends Controller {
                             //hacemos el descuento en la cuenta origen
 
 
-                            $sql = "INSERT INTO ctacteClientes
-                                            (tipoMov, conceptoId, clienteId, productoId, descripcion, origen, identificadorOrigen, monto, fecha, userStamp, timeStamp, sucursalId, saldoAcumulado)
-                                            VALUES (:tipoMov, :conceptoId, :clienteId,:productoId, :descripcion, :origen, :identificadorOrigen, :monto, :fecha, :userStamp, :timeStamp, :sucursalId, :saldoAcumulado)";
+                            $sql = "INSERT INTO ctacte
+                                            (tipoMov, productoCtaCteId, conceptoId, descripcion, origen, identificadorOrigen, monto, fecha, userStamp, timeStamp, sucursalId, saldoAcumulado)
+                                            VALUES (:tipoMov, :productoCtaCteId, :conceptoId, :descripcion, :origen, :identificadorOrigen, :monto, :fecha, :userStamp, :timeStamp, :sucursalId, :saldoAcumulado)";
 
 
                             $command = $connection->createCommand($sql);
@@ -481,21 +486,22 @@ class OrdenesPagoController extends Controller {
                             $origen="OrdenesPago";
                             $identificadorOrigen=$ordenesPago->id;
                             $fecha = Date("Y-m-d");
-                            $productoId = 1;
+                     		//$productoId = 1;
                             $userStamp = Yii::app()->user->model->username;
                             $timeStamp = Date("Y-m-d h:m:s");
                             $sucursalId = Yii::app()->user->model->sucursalId;
-                            $ctacteCliente = new CtacteClientes();
-                            $ctacteCliente->clienteId=$ordenesPago->clienteId;
-                            $saldoAcumuladoActual = $ctacteCliente->getSaldoAcumuladoActual();
+                            
+                            $ctacte = new Ctacte();
+                            $ctacte->productoCtaCteId=$productoCliente->id;
+                            
+                            $saldoAcumuladoActual = $ctacte->getSaldoAcumuladoActual();
                             $saldoAcumulado=$saldoAcumuladoActual-$ordenesPago->monto;
 
                             $clienteId = $ordenesPago->clienteId;
 //
                             $command->bindValue(":tipoMov", $tipoMov, PDO::PARAM_STR);
+							$command->bindValue(":productoCtaCteId", $productoCliente->id, PDO::PARAM_STR);
                             $command->bindValue(":conceptoId", $conceptoId, PDO::PARAM_STR);
-                            $command->bindValue(":clienteId", $ordenesPago->clienteId, PDO::PARAM_STR);
-                            $command->bindValue(":productoId", $productoId, PDO::PARAM_STR);
                             $command->bindValue(":descripcion", $descripcion, PDO::PARAM_STR);
                             $command->bindValue(":origen", $origen, PDO::PARAM_STR);
                             $command->bindValue(":identificadorOrigen", $identificadorOrigen, PDO::PARAM_STR);

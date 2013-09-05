@@ -37,7 +37,7 @@ class Ctacte extends CActiveRecord
     public $fechaInicio;
     public $fechaFin;
 	public $productoId;
-	public $clienteId;
+	public $pkModeloRelacionado;
 	public $productoCtaCteBusqueda;
 	public $nombreModelo;
 	
@@ -54,7 +54,7 @@ class Ctacte extends CActiveRecord
                 return 0;
         } else return 0;
     }
-		
+	/*
     public function searchByFechaAndCliente($fechaIni, $fechaFin, $productoCtaCteId) {
         $criteria = new CDbCriteria;
         $criteria->condition = "(fecha BETWEEN :start_day AND :end_day) AND clienteId=:clienteId";
@@ -66,7 +66,7 @@ class Ctacte extends CActiveRecord
                 ));
         return $dataProvider;
     }
-	
+	*/
 	////// Métodos generados
 	
 	/**
@@ -155,8 +155,8 @@ class Ctacte extends CActiveRecord
 		// Warning: Please modify the following code to remove attributes that
 		// should not be searched.
 		
-		if (isset($_GET['Ctacte']['clienteId']))
-			$this->clienteId = $_GET['Ctacte']['clienteId'];
+		if (isset($_GET['Ctacte']['pkModeloRelacionado']))
+			$this->pkModeloRelacionado = $_GET['Ctacte']['pkModeloRelacionado'];
 		if (isset($_GET['Ctacte']['productoId']))
 			$this->productoId = $_GET['Ctacte']['productoId'];
 		if (isset($_GET['Ctacte']['fechaInicio']))
@@ -168,7 +168,7 @@ class Ctacte extends CActiveRecord
      
         $criteria->addBetweenCondition('fecha',$this->fechaInicio,$this->fechaFin);
 		$criteria->with = array('productoCtaCte');
-		$criteria->compare('productoCtaCte.pkModeloRelacionado',$this->clienteId);
+		$criteria->compare('productoCtaCte.pkModeloRelacionado',$this->pkModeloRelacionado);
 		$criteria->compare('productoCtaCte.productoId',$this->productoId);
 		$criteria->compare('productoCtaCte.nombreModelo',$this->nombreModelo);
 		$criteria->together = true;

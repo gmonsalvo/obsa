@@ -10,18 +10,21 @@ class OrdenIngresoController extends Controller
 	//o tambien anula la orden dependiendo de la accion seleccionada por el usuario
 	public function actionUpdateOrden() {
       if (isset($_POST["boton"]) && isset($_POST["ordenIngresoId"])) {
+      	
+        	$connection = Yii::app()->db;
+			$transaction = $connection->beginTransaction();
+		
             $id = $_POST["ordenIngresoId"];
             $ordenIngreso = $this->loadModel($id);
             try {
                 if ($_POST["boton"] == "Acreditar Fondos") {
-                    if($ordenIngreso->tipo == OrdenIngreso::TIPO_DEPOSITO){
-                    	$connection = Yii::app()->db;
-            			$transaction = $connection->beginTransaction();
-						
+                    if($ordenIngreso->tipo == OrdenIngreso::TIPO_DEPOSITO) {
 						$productoCliente = Productoctacte::model()->find("pkModeloRelacionado=:clienteId AND productoId=:productoId AND nombreModelo=:nombreModelo", array(":clienteId" => $ordenIngreso->clienteId, ":productoId" => $ordenIngreso->productoId, ":nombreModelo" => "Clientes"));
 						
-						if (!$productoCliente)
+						if (!$productoCliente) {
+							$transaction->rollback();
 							return false;
+						}
 						
 	                    //metemos un credito en cuenta corriente para este cliente
 						$sql = "INSERT INTO ctacte
@@ -57,6 +60,7 @@ class OrdenIngresoController extends Controller
 	                    $command->bindValue(":timeStamp", $timeStamp, PDO::PARAM_STR);
 	                    $command->bindValue(":sucursalId", $sucursalId, PDO::PARAM_STR);
 	                    $command->execute();
+						
 						//tenemos que meter un movimiento en la caja de operaciones sea cual sea tipo de ordeningreso
 						$flujoFondos=new FlujoFondos;
 						$flujoFondos->cuentaId='6'; // cajade oepracion
@@ -71,11 +75,16 @@ class OrdenIngresoController extends Controller
 						$flujoFondos->sucursalId = Yii::app()->user->model->sucursalId;
 						$flujoFondos->userStamp = Yii::app()->user->model->username;
 						$flujoFondos->timeStamp = Date("d/m/Y h:m:s");
-						$flujoFondos->save();
+						if (!$flujoFondos->save()) {
+							$transaction->rollback();
+							return false;							
+						}
 
 						$ordenIngreso->estado = OrdenIngreso::ESTADO_PAGADA;
-                    	$ordenIngreso->save();
-
+						if (!$ordenIngreso->save()){
+							$transaction->rollback();
+							return false;
+						}
 						$transaction->commit();
                 	} else {
                 		if($ordenIngreso->tipo == OrdenIngreso::TIPO_PESIFICACION_INDIVIDUAL){
@@ -85,9 +94,14 @@ class OrdenIngresoController extends Controller
 							$tasaDescuento = (1-($ordenIngreso->monto/$cheque->montoOrigen))*100;
 							if(Pesificaciones::model()->AcreditarCheque($chequeId, $tasaDescuento)){
 								$ordenIngreso->estado = OrdenIngreso::ESTADO_PAGADA;
-                    			$ordenIngreso->save();
+                    			if (!$ordenIngreso->save()) {
+									$transaction->rollback();
+									return false;
+                    			}
+								$transaction->commit();
 							} else {
 								$this->redirect(array('admin'));
+								$transaction->commit();
 							}
 							// Cheques::model()->updateByPk($ordenIngreso->identificadorOrigen, array("estado"=>Cheques::TYPE_ACREDITADO));
                 		}
@@ -96,10 +110,14 @@ class OrdenIngresoController extends Controller
                 } else {
                     if ($_POST["boton"] == "Anular") {
                         $ordenIngreso->estado = OrdenIngreso::ESTADO_ANULADA;
-                        $ordenIngreso->save();
+                        if (!$ordenIngreso->save()) {
+							$transaction->rollback();
+							return false;
+                        }
                         $ordenIngreso->unsetAttributes();
                         Yii::app()->user->setFlash('success','Orden de Ingreso Anulada');
 						$this->render('/ordenIngreso/admin',array('model'=>$ordenIngreso));
+						$transaction->commit();
                     }
                 }
             } catch (Exception $e) { // an exception is raised if a query fails

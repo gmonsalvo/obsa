@@ -10,6 +10,26 @@
 			elemento.style.display = "";
 	}
 	
+	function validarCheck(producto, cliente) {
+		
+		if (!producto.checked){
+			
+			jQuery('#botonEnviar').attr("disabled", "disabled");
+			
+			parametros = {"productoId":producto.value, "clienteId":cliente};
+			
+			jQuery.ajax({
+				data:parametros,
+				type:  'post',
+	            url:'../validarProducto',
+	            success:function(resultado){
+	                eval(resultado);
+	            }
+	        });
+		}
+        return false;
+	}
+	
 </script>
 
 <div class="form">
@@ -121,7 +141,7 @@
 			echo CHtml::link('(Mostrar)', array(''), array('onclick'=>'visibilidadElemento(\'cargaProductos\'); return false;')); 
 		?>
 		
-		<div class="row" id="cargaProductos" style="width:100px; display:none;">
+		<div class="row" id="cargaProductos" style="width:300px; display:none;">
 		<?php
 			$model->refresh();
 			
@@ -137,15 +157,15 @@
 			
 			echo CHtml::activeCheckboxList(
 			  $model, 'productosId', 
-			  CHtml::listData(Productos::model()->findAll(), 'id', 'nombre')/*,
-			  array('template'=>'<li>{input} {label}</li>',  'class'=>'categoryFilter',)*/
+			  CHtml::listData(Productos::model()->findAll(), 'id', 'nombre'),
+			  array('labelOptions'=>array('style'=>'display: inline;'), 'onclick'=>'validarCheck(this, '.$model->id.')')
 			);
 		?>
 		</div>
 	</div>	
 
 	<div class="row buttons">
-		<?php echo CHtml::submitButton($model->isNewRecord ? 'Guardar' : 'Guardar Cambios'); ?>
+		<?php echo CHtml::submitButton($model->isNewRecord ? 'Guardar' : 'Guardar Cambios', array('id'=>'botonEnviar')); ?>
 	</div>
 
 <?php $this->endWidget(); ?>

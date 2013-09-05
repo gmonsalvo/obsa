@@ -384,6 +384,30 @@ class ClientesController extends Controller {
 		return $contenido;
     } 	
 
+	public function actionValidarProducto()
+	{
+		$productoId = $_POST['productoId'];
+		$clienteId = $_POST['clienteId'];
+		
+		$productoCtaCte = Productoctacte::model()->find("pkModeloRelacionado=:clienteId AND productoId=:productoId AND nombreModelo=:nombreModelo", array(":clienteId" => $clienteId, ":productoId" => $productoId, ":nombreModelo" => "Clientes"));
+		
+		if (!$productoCtaCte) {
+			echo 'jQuery(\'#botonEnviar\').removeAttr(\'disabled\');';
+			return true;
+		}
+		
+		$ctacte = Ctacte::model()->find("productoCtaCteId=:productoCtaCteId", array(":productoCtaCteId" => $productoCtaCte->id));
+		
+		if (!$ctacte) {
+			echo 'jQuery(\'#botonEnviar\').removeAttr(\'disabled\');';
+			return true;
+		}
+		
+		$contenido = 'producto.checked = true; jQuery(\'#botonEnviar\').removeAttr(\'disabled\');';
+		
+		echo $contenido;
+	} 
+
 	////// Métodos generados
 
     /**
@@ -411,7 +435,7 @@ class ClientesController extends Controller {
 //                'expression' => 'Yii::app()->user->checkAccess("usuario")',
 //            ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions' => array('create', 'update', 'admin', 'updatefield', 'delete', 'getCliente', 'getDataProvider', 'buscarRazonSocial', 'buscarNombreCliente', 'getSaldos', 'getInversoresDeCheque', 'ranking', 'informePosicion', 'getInforme', 'exportPDF', 'informePDF','exportarRanking','exportarLista'),
+                'actions' => array('create', 'update', 'admin', 'updatefield', 'delete', 'getCliente', 'getDataProvider', 'buscarRazonSocial', 'buscarNombreCliente', 'getSaldos', 'getInversoresDeCheque', 'ranking', 'informePosicion', 'getInforme', 'exportPDF', 'informePDF', 'exportarRanking', 'exportarLista', 'validarProducto'),
                 'users' => array('@'),
                 //'expression' => 'Yii::app()->user->checkAccess("administrador")',
             ),

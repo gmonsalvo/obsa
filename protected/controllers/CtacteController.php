@@ -6,7 +6,7 @@ class CtacteController extends Controller
 	
 	public function actionCargarProductosCliente() {
 		
-		$cliente = Clientes::model()->findByPk($_POST['Ctacte']['clienteId']);
+		$cliente = Clientes::model()->findByPk($_POST['Ctacte']['pkModeloRelacionado']);
 		
 		foreach($cliente->productos as $producto)
 			echo CHtml::tag('option', array('value'=>$producto->id),CHtml::encode($producto->nombre),true);

@@ -6,6 +6,7 @@
  * The followings are the available columns in table 'ordenesPago':
  * @property integer $id
  * @property integer $clienteId
+ * @property integer $productoId
  * @property string $fecha
  * @property string $monto
  * @property string $descripcion
@@ -28,7 +29,7 @@ class OrdenesPago extends CustomCActiveRecord {
 
     private $saldo;
     private $montoCheques;
-	public $productoId;
+	
     /**
      * Returns the static model of the specified AR class.
      * @return OrdenesPago the static model class
@@ -61,8 +62,8 @@ class OrdenesPago extends CustomCActiveRecord {
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array('clienteId, fecha, monto, estado, sucursalId', 'required'),
-            array('clienteId, estado, sucursalId', 'numerical', 'integerOnly' => true),
+            array('clienteId, productoId, fecha, monto, estado, sucursalId', 'required'),
+            array('clienteId, productoId, estado, sucursalId', 'numerical', 'integerOnly' => true),
             array('porcentajePesificacion', 'length', 'max' => 7),
             array('monto', 'length', 'max' => 15),
             array('descripcion', 'length', 'max' => 100),
@@ -70,7 +71,7 @@ class OrdenesPago extends CustomCActiveRecord {
             array('timeStamp', 'safe'),
             // The following rule is used by search().
             // Please remove those attributes that should not be searched.
-            array('id, clienteId, fecha, monto, descripcion, estado, sucursalId, userStamp, timeStamp', 'safe', 'on' => 'search'),
+            array('id, clienteId, productoId, fecha, monto, descripcion, estado, sucursalId, userStamp, timeStamp', 'safe', 'on' => 'search'),
         );
     }
 
@@ -83,6 +84,7 @@ class OrdenesPago extends CustomCActiveRecord {
         return array(
             'formaPagoOrdens' => array(self::HAS_MANY, 'FormaPagoOrden', 'ordenPagoId'),
             'cliente' => array(self::BELONGS_TO, 'Clientes', 'clienteId'),
+            'producto' => array(self::BELONGS_TO, 'Productos', 'productoId'),
             'sucursal' => array(self::BELONGS_TO, 'Sucursales', 'sucursalId'),
             'operacionesChequeOrdenPago'=>array(self::HAS_ONE, 'OperacionesChequeOrdenPago','ordenPagoId'),
             'recibos' => array(self::HAS_MANY, 'RecibosOrdenPago', 'ordenPagoId'),
@@ -97,6 +99,7 @@ class OrdenesPago extends CustomCActiveRecord {
         return array(
             'id' => 'ID',
             'clienteId' => 'Cliente',
+            'productoId' => 'Producto',
             'fecha' => 'Fecha',
             'monto' => 'Monto',
             'descripcion' => 'Descripcion',
@@ -120,6 +123,7 @@ class OrdenesPago extends CustomCActiveRecord {
 
         $criteria->compare('id', $this->id);
         $criteria->compare('clienteId', $this->clienteId);
+		$criteria->compare('productoId', $this->productoId);
         $criteria->compare('fecha', $this->fecha, true);
         $criteria->compare('monto', $this->monto, true);
         $criteria->compare('descripcion', $this->descripcion, true);
