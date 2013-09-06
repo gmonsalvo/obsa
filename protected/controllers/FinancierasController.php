@@ -60,6 +60,30 @@ class FinancierasController extends Controller
 		return $contenido;
     } 	
 	
+	public function actionValidarProducto()
+	{
+		$productoId = $_POST['productoId'];
+		$financieraId = $_POST['financieraId'];
+		
+		$productoCtaCte = Productoctacte::model()->find("pkModeloRelacionado=:financieraId AND productoId=:productoId AND nombreModelo=:nombreModelo", array(":financieraId" => $financieraId, ":productoId" => $productoId, ":nombreModelo" => "Financieras"));
+		
+		if (!$productoCtaCte) {
+			echo 'jQuery(\'#botonEnviar\').removeAttr(\'disabled\');';
+			return true;
+		}
+		
+		$ctacte = Ctacte::model()->find("productoCtaCteId=:productoCtaCteId", array(":productoCtaCteId" => $productoCtaCte->id));
+		
+		if (!$ctacte) {
+			echo 'jQuery(\'#botonEnviar\').removeAttr(\'disabled\');';
+			return true;
+		}
+		
+		$contenido = 'producto.checked = true; jQuery(\'#botonEnviar\').removeAttr(\'disabled\');';
+		
+		echo $contenido;
+	} 
+	
 	////// Métodos generados
 	
 	/**
@@ -85,7 +109,7 @@ class FinancierasController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create', 'update', 'admin', 'delete'),
+				'actions'=>array('create', 'update', 'admin', 'delete', 'validarProducto'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -187,6 +211,9 @@ class FinancierasController extends Controller
 
 		if(isset($_POST['Financieras'])) {
 			
+			$transaccion = Yii::app()->db->beginTransaction();
+			$error = false;
+			
 			$data=array();
 			
 			$model->attributes=$_POST['Financieras'];
@@ -200,26 +227,31 @@ class FinancierasController extends Controller
 			
 			$model->responsables = $data;
 			
-			/*
-			header('Content-type: text/plain');
-			print_r($model->relacionProductosFinanciera);
-			exit;
-			*/
-			
-			$model->productos = array();
-			$model->productosFinanciera = array();
-			
 			$productos = $_POST['Financieras']['productosId'];
+			$productosFinanciera = $model->productosFinanciera;
 			
-			$transaccion = Yii::app()->db->beginTransaction();
-			
-			if($model->save()) {
+			if (!$productos) {
+				$model->productos = array();
+				$model->productosFinanciera = array();
+			}
+			else {
+				if ($productosFinanciera) {
+					$indice = 0;
+					foreach ($productosFinanciera as $producto) {
+						if (!in_array($producto->productoId, $productos))
+							unset($productosFinanciera[$indice]);
+						$indice++;
+					}
+				}
 				
-				$error = false;
-				
-				if ($productos)
-					foreach ($productos as $idproducto) {
-						$relacion = new Productoctacte();
+				foreach ($productos as $idproducto) {
+					
+					$relacion = new Productoctacte();
+					
+					$resultado = $relacion->find("productoId = :productoId AND pkModeloRelacionado = :pkModeloRelacionado AND nombreModelo = :nombreModelo", array(":productoId" => $idproducto, ":pkModeloRelacionado" => $model->id, ":nombreModelo" => "Financieras"));
+					
+					if (!$resultado) {
+						
 						$relacion->nombreModelo = 'Financieras';
 						$relacion->pkModeloRelacionado = $model->id;
 						$relacion->productoId = (int) $idproducto;
@@ -229,15 +261,27 @@ class FinancierasController extends Controller
 							$error = true;
 							break;
 						}
+						
+						array_push($productosFinanciera, $relacion);
 					}
+				}
 				
 				if (!$error) {
-					$transaccion->commit();
-					$this->redirect(array('view','id'=>$model->id));
+					
+					$model->productosFinanciera = $productosFinanciera;
+					
+					if ($model->save()) {
+						$model = $this->loadModel($id);
+						
+						$transaccion->commit();
+						$this->redirect(array('view','id'=>$model->id));
+					}
+					else
+						$transaccion->rollBack();
 				}
 				else
 					$transaccion->rollBack();
-			}
+			}			
 		}
 
 		$this->render('update',array('model'=>$model,));
@@ -254,11 +298,21 @@ class FinancierasController extends Controller
 		{
 			// we only allow deletion via POST request
 			
-			$model = $this->loadModel($id); 
-			
+			$model = $this->loadModel($id);
+			 
 			$model->responsables = array();
 			
-			$model->productos = array();
+			$ctacte = new Ctacte();
+			
+			if ($model->productosFinanciera) {
+				foreach ($model->productosFinanciera as $productoFinanciera) {
+					$resultado = $ctacte->find("productoCtaCteId = :productoCtaCteId", array(":productoCtaCteId" => $productoFinanciera->id));
+					
+					if ($resultado)
+						throw new CHttpException('Esta financiera tiene movimientos activos. No se puede eliminar.');
+				}	
+			}
+			
 			$model->productosFinanciera = array();
 			
 			if ($model->save(false))

@@ -523,22 +523,37 @@ class ClientesController extends Controller {
         // $this->performAjaxValidation($model);
 
         if (isset($_POST['Clientes'])) {
+        	
+			$transaccion = Yii::app()->db->beginTransaction();
+			$error = false;
+			
             $model->attributes = $_POST['Clientes'];
 			
-			$model->productos = array();
-			$model->productosCliente = array();
-			
 			$productos = $_POST['Clientes']['productosId'];
+			$productosCliente = $model->productosCliente;
 			
-			$transaccion = Yii::app()->db->beginTransaction();
-			
-			if($model->save()) {
+			if (!$productos) {
+				$model->productos = array();
+				$model->productosCliente = array();
+			}
+			else {
+				if ($productosCliente) {
+					$indice = 0;
+					foreach ($productosCliente as $producto) {
+						if (!in_array($producto->productoId, $productos))
+							unset($productosCliente[$indice]);
+						$indice++;
+					}
+				}
 				
-				$error = false;
-				
-				if ($productos)
-					foreach ($productos as $idproducto) {
-						$relacion = new Productoctacte();
+				foreach ($productos as $idproducto) {
+					
+					$relacion = new Productoctacte();
+					
+					$resultado = $relacion->find("productoId = :productoId AND pkModeloRelacionado = :pkModeloRelacionado AND nombreModelo = :nombreModelo", array(":productoId" => $idproducto, ":pkModeloRelacionado" => $model->id, ":nombreModelo" => "Clientes"));
+					
+					if (!$resultado) {
+						
 						$relacion->nombreModelo = 'Clientes';
 						$relacion->pkModeloRelacionado = $model->id;
 						$relacion->productoId = (int) $idproducto;
@@ -548,15 +563,28 @@ class ClientesController extends Controller {
 							$error = true;
 							break;
 						}
+						
+						array_push($productosCliente, $relacion);
 					}
+				}
 				
 				if (!$error) {
-					$transaccion->commit();
-					$this->redirect(array('view','id'=>$model->id));
+					
+					$model->productosCliente = $productosCliente;
+					
+					if ($model->save()) {
+						$model = $this->loadModel($id);
+						
+						$transaccion->commit();
+						$this->redirect(array('view','id'=>$model->id));
+					}
+					else
+						$transaccion->rollBack();
 				}
 				else
 					$transaccion->rollBack();
-			}			
+			}
+			
 		}
 
         $this->render('update', array(
@@ -575,7 +603,17 @@ class ClientesController extends Controller {
             
             $model = $this->loadModel($id);
             
-			$model->productos = array();
+			$ctacte = new Ctacte();
+			
+			if ($model->productosCliente) {
+				foreach ($model->productosCliente as $productoCliente) {
+					$resultado = $ctacte->find("productoCtaCteId = :productoCtaCteId", array(":productoCtaCteId" => $productoCliente->id));
+					
+					if ($resultado)
+						throw new CHttpException('Este cliente tiene movimientos activos. No se puede eliminar.');
+				}	
+			}
+			
 			$model->productosCliente = array();
 			
 			if ($model->save(false))
