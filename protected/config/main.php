@@ -66,10 +66,11 @@ return array(
         // uncomment the following to use a MySQL database
 
         'db' => array(
-            'connectionString' => 'mysql:host=127.0.0.1;dbname=obsa',
+            'connectionString' => 'mysql:host=127.0.0.1;dbname=obsa_devel',
             'emulatePrepare' => true,
             'username' => 'root',
-            'password' => 'eLaStIx.2oo7',
+            //'password' => 'eLaStIx.2oo7',
+            'password' => 'montreal',
             'charset' => 'utf8',
              'enableProfiling' => true,
             'enableParamLogging' => true,
@@ -78,20 +79,16 @@ return array(
             // use 'site/error' action to display errors
             'errorAction' => 'site/error',
         ),
-        'log' => array(
-            'class' => 'CLogRouter',
-            'routes' => array(
+        'log'=>array(
+            'class'=>'CLogRouter',
+            'routes'=>array(
                 array(
-                    'class' => 'CWebLogRoute',
-                    'levels'=>'trace, info, error, warning',
-                    'categories'=>'system.db.*',
-                    //'logFile' => 'db.log',
-                    'showInFireBug'=>false //true/falsefirebug only - turn off otherwise
-                    //'filter' => 'CLogFilter'
+                    'class'=>'ext.yii-debug-toolbar.YiiDebugToolbarRoute',
+                    // Access is restricted by default to the localhost
+                    //'ipFilters'=>array('127.0.0.1','192.168.1.*', 88.23.23.0/24),
                 ),
-                // uncomment the following to show log messages on web pages
             ),
-        ),
+         ),
         // 'clientScript' => array(
         //     // 'class' => 'ext.nlacsoft.NLSClientScript',
         //     // 'hashMode' => 'PATH', //PATH|CONTENT
