@@ -27,6 +27,8 @@ class OrdenIngreso extends CustomCActiveRecord {
     const TIPO_PESIFICACION_INDIVIDUAL = 1;
 
 	public $nombreCliente;
+	public $clienteId;
+	public $productoId;
 
     /**
      * Returns the static model of the specified AR class.
@@ -68,9 +70,11 @@ class OrdenIngreso extends CustomCActiveRecord {
         // NOTE: you may need to adjust the relation name and the related
         // class name for the relations automatically generated below.
         return array(
-            'cliente' => array(self::BELONGS_TO, 'Clientes', 'clienteId'),
+        	'productoCtaCte' => array(self::BELONGS_TO, 'Productoctacte', 'productoCtaCteId'),
+        	'productosCliente' => array(self::HAS_MANY, 'Productoctacte', 'pkModeloRelacionado'),
+        	'cliente' => array(self::HAS_MANY, 'Clientes', 'pkModeloRelacionado', 'through' => 'productosCliente'),
+            'productos' => array(self::HAS_MANY, 'Productos', 'productoId', 'through' => 'productosCliente'),
             'sucursal' => array(self::BELONGS_TO, 'Sucursales', 'sucursalId'),
-            'producto' => array(self::BELONGS_TO, 'Productos', 'productoId'),
         );
     }
 

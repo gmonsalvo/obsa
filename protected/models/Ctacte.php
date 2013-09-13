@@ -116,7 +116,6 @@ class Ctacte extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'productoCtaCte' => array(self::BELONGS_TO, 'Productoctacte', 'productoCtaCteId'),
-			'cliente' => array(self::HAS_MANY, 'Clientes', 'clienteId', 'through'=>'productosCliente', 'condition' => 'productosCliente.nombreModelo=\'Clientes\''),
             'concepto' => array(self::BELONGS_TO, 'Conceptos', 'conceptoId'),
             'sucursal' => array(self::BELONGS_TO, 'Sucursales', 'sucursalId'),
 		);
