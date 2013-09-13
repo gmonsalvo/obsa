@@ -72,6 +72,11 @@
 		?>
 	</div>
 	
+	<div class="row">
+		<?php echo $form->labelEx($model,'productoId'); ?>
+		<?php echo $form->dropDownList($model, 'productoId', array(), array('empty' => 'Seleccionar un producto')) ?>
+		<?php echo $form->error($model,'productoId'); ?>
+	</div>
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'monto'); ?>
@@ -89,14 +94,6 @@
 		<?php echo $form->textField($model,'descripcion',array('size'=>60,'maxlength'=>100)); ?>
 		<?php echo $form->error($model,'descripcion'); ?>
 	</div>
-
-	<div class="row">
-		<?php echo $form->labelEx($model,'productoId'); ?>
-		<?php echo $form->dropDownList($model, 'productoId', array(), array('empty' => 'Seleccionar un producto')) ?>
-		<?php echo $form->error($model,'productoId'); ?>
-	</div>
-
-
 
 	<div class="row buttons">
 		<?php echo CHtml::submitButton($model->isNewRecord ? 'Guardar' : 'Guardar Cambios'); ?>

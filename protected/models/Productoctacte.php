@@ -82,6 +82,7 @@ class Productoctacte extends CActiveRecord
 			'ctactes' => array(self::HAS_MANY, 'Ctacte', 'productoCtaCteId'),
 			'financiera' => array(self::BELONGS_TO, 'Financieras', 'pkModeloRelacionado'),
 			'producto' => array(self::BELONGS_TO, 'Productos', 'productoId'),
+			'ordenIngreso' => array(self::HAS_MANY, 'OrdenIngreso', 'pkModeloRelacionado'),
 		);
 	}
 

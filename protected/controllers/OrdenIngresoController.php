@@ -16,16 +16,13 @@ class OrdenIngresoController extends Controller
 		
             $id = $_POST["ordenIngresoId"];
             $ordenIngreso = $this->loadModel($id);
+			
+			print_r("2");
+			exit;
+			
             try {
                 if ($_POST["boton"] == "Acreditar Fondos") {
                     if($ordenIngreso->tipo == OrdenIngreso::TIPO_DEPOSITO) {
-						$productoCliente = Productoctacte::model()->find("pkModeloRelacionado=:clienteId AND productoId=:productoId AND nombreModelo=:nombreModelo", array(":clienteId" => $ordenIngreso->clienteId, ":productoId" => $ordenIngreso->productoId, ":nombreModelo" => "Clientes"));
-						
-						if (!$productoCliente) {
-							$transaction->rollback();
-							return false;
-						}
-						
 	                    //metemos un credito en cuenta corriente para este cliente
 						$sql = "INSERT INTO ctacte
 	                            (tipoMov, productoCtaCteId, conceptoId, descripcion, monto, fecha, origen, identificadorOrigen, userStamp, timeStamp, sucursalId, saldoAcumulado)
@@ -40,7 +37,7 @@ class OrdenIngresoController extends Controller
 	                    $identificadorOrigen=$ordenIngreso->id;
 
 	                    $ctacte = new Ctacte();
-	                    $ctacte->productoCtaCteId=$productoCliente->id;
+	                    $ctacte->productoCtaCteId=$ordenIngreso->productoCtaCteId;
 	                    $saldoAcumuladoActual = $ctacte->getSaldoAcumuladoActual();
 	                    $saldoAcumulado=$saldoAcumuladoActual+$ordenIngreso->monto;
 	                    $userStamp = Yii::app()->user->model->username;
@@ -49,7 +46,7 @@ class OrdenIngresoController extends Controller
 	                    $command = $connection->createCommand($sql);
 						$command->bindValue(":tipoMov", $tipoMov, PDO::PARAM_STR);
 	                    $command->bindValue(":conceptoId", $conceptoId, PDO::PARAM_STR);
-	                    $command->bindValue(":productoCtaCteId", $productoCliente->id, PDO::PARAM_STR);
+	                    $command->bindValue(":productoCtaCteId", $ordenIngreso->productoCtaCteId, PDO::PARAM_STR);
 	                    $command->bindValue(":descripcion", $descripcion, PDO::PARAM_STR);
 	                    $command->bindValue(":monto", $ordenIngreso->monto, PDO::PARAM_STR);
 	                    $command->bindValue(":fecha", $fecha, PDO::PARAM_STR);
@@ -79,7 +76,6 @@ class OrdenIngresoController extends Controller
 							$transaction->rollback();
 							return false;							
 						}
-
 						$ordenIngreso->estado = OrdenIngreso::ESTADO_PAGADA;
 						if (!$ordenIngreso->save()){
 							$transaction->rollback();
@@ -283,10 +279,18 @@ class OrdenIngresoController extends Controller
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
-
+		
 		if(isset($_POST['OrdenIngreso']))
 		{
 			$model->attributes=$_POST['OrdenIngreso'];
+			
+			$productoCliente = Productoctacte::model()->find("pkModeloRelacionado=:clienteId AND productoId=:productoId AND nombreModelo=:nombreModelo", array(":clienteId" => $_POST['OrdenIngreso']['clienteId'], ":productoId" => $_POST['OrdenIngreso']['productoId'], ":nombreModelo" => "Clientes"));
+			
+			if (!$productoCliente)
+				return false;
+			
+			$model->productoCtaCteId = $productoCliente->id;
+			
 			if($model->save())
 			    Yii::app()->user->setFlash('success','Ingreso de Fondos realizado con exito');
 				$model->unsetAttributes();

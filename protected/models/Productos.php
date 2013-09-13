@@ -95,6 +95,7 @@ class Productos extends CustomCActiveRecord
 			'ctacteClientes' => array(self::HAS_MANY, 'CtacteClientes', 'productoId'),
 			'sucursal' => array(self::BELONGS_TO, 'Sucursales', 'sucursalId'),
 			'moneda' => array(self::BELONGS_TO, 'Monedas', 'monedaId'),
+			'productoCtaCte' => array(self::HAS_MANY, 'Productoctacte', 'productoId'),
 		);
 	}
 

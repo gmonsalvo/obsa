@@ -26,9 +26,10 @@ class OrdenIngreso extends CustomCActiveRecord {
     const TIPO_PESIFICACION_INDIVIDUAL = 1;
 
 	public $nombreCliente;
-    public $cliente;
-    public $pkModeloRelacionado;
-    public $productoId;
+	public $cliente;
+	public $pkModeloRelacionado;
+	public $productoId;
+	public $clienteId;
 
     /**
      * Returns the static model of the specified AR class.
@@ -70,19 +71,20 @@ class OrdenIngreso extends CustomCActiveRecord {
         // NOTE: you may need to adjust the relation name and the related
         // class name for the relations automatically generated below.
         return array(
+
             'sucursal' => array(self::BELONGS_TO, 'Sucursales', 'sucursalId'),
+            
+            'productosCliente' => array(self::HAS_MANY, 'Productoctacte', 'pkModeloRelacionado'),
+            'productos' => array(self::HAS_MANY, 'Productos', 'productoId', 'through' => 'productosCliente'),
+            'cliente' => array(self::HAS_MANY, 'Clientes', 'pkModeloRelacionado', 'through' => 'productosCliente'),
+
             'productoCtaCte' => array(self::BELONGS_TO, 'Productoctacte', 'productoCtaCteId',),
             'productoCtaCte2' => array(self::BELONGS_TO, 'Productoctacte', 'pkModeloRelacionado',),
-            //'productosCliente' => array(self::HAS_MANY, 'Productoctacte', 'pkModeloRelacionado'),
-            'clientes' => array(self::HAS_MANY, 'Clientes', 'clienteId', 
-                            'through'=>'productoCtaCte', 
-                            'condition' => 'productoCtaCte.nombreModelo=\'Clientes\' and productoCtaCte.pkModeloRelacionado=t.clienteId'),
 
             'producto' => array(self::HAS_ONE, 'Productos','productoId',
                             'through'=>'productoCtaCte2', 
                             'condition' => 'productoCtaCte2.productoId=producto.id',
                             ),
-            
         );
     }
 
