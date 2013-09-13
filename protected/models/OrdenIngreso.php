@@ -5,11 +5,10 @@
  *
  * The followings are the available columns in table 'ordenIngreso':
  * @property integer $id
+ * @property integer $productoCtaCteId
  * @property string $fecha
- * @property integer $clienteId
  * @property string $monto
  * @property string $descripcion
- * @property string $productoId
  * @property integer $estado
  * @property integer $sucursalId
  * @property string $userStamp
@@ -27,6 +26,9 @@ class OrdenIngreso extends CustomCActiveRecord {
     const TIPO_PESIFICACION_INDIVIDUAL = 1;
 
 	public $nombreCliente;
+    public $cliente;
+    public $pkModeloRelacionado;
+    public $productoId;
 
     /**
      * Returns the static model of the specified AR class.
@@ -50,14 +52,14 @@ class OrdenIngreso extends CustomCActiveRecord {
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array('fecha, clienteId, monto, productoId, sucursalId, userStamp, timeStamp', 'required'),
-            array('clienteId, estado, sucursalId, tipo, identificadorOrigen', 'numerical', 'integerOnly' => true),
+            array('fecha, monto, sucursalId, userStamp, timeStamp', 'required'),
+            array('productoCtaCteId, estado, sucursalId, tipo, identificadorOrigen', 'numerical', 'integerOnly' => true),
             array('monto', 'length', 'max' => 15),
             array('descripcion', 'length', 'max' => 100),
             array('productoId, userStamp, origen', 'length', 'max' => 45),
             // The following rule is used by search().
             // Please remove those attributes that should not be searched.
-            array('id, fecha, clienteId, monto, descripcion, productoId, estado, sucursalId, userStamp, timeStamp, tipo, identificadorOrigen, origen', 'safe', 'on' => 'search'),
+            array('id, productoCtaCteId, fecha, monto, descripcion, estado, sucursalId, userStamp, timeStamp, tipo, identificadorOrigen, origen', 'safe', 'on' => 'search'),
         );
     }
 
@@ -68,9 +70,19 @@ class OrdenIngreso extends CustomCActiveRecord {
         // NOTE: you may need to adjust the relation name and the related
         // class name for the relations automatically generated below.
         return array(
-            'cliente' => array(self::BELONGS_TO, 'Clientes', 'clienteId'),
             'sucursal' => array(self::BELONGS_TO, 'Sucursales', 'sucursalId'),
-            'producto' => array(self::BELONGS_TO, 'Productos', 'productoId'),
+            'productoCtaCte' => array(self::BELONGS_TO, 'Productoctacte', 'productoCtaCteId',),
+            'productoCtaCte2' => array(self::BELONGS_TO, 'Productoctacte', 'pkModeloRelacionado',),
+            //'productosCliente' => array(self::HAS_MANY, 'Productoctacte', 'pkModeloRelacionado'),
+            'clientes' => array(self::HAS_MANY, 'Clientes', 'clienteId', 
+                            'through'=>'productoCtaCte', 
+                            'condition' => 'productoCtaCte.nombreModelo=\'Clientes\' and productoCtaCte.pkModeloRelacionado=t.clienteId'),
+
+            'producto' => array(self::HAS_ONE, 'Productos','productoId',
+                            'through'=>'productoCtaCte2', 
+                            'condition' => 'productoCtaCte2.productoId=producto.id',
+                            ),
+            
         );
     }
 
@@ -81,7 +93,7 @@ class OrdenIngreso extends CustomCActiveRecord {
         return array(
             'id' => 'ID',
             'fecha' => 'Fecha',
-            'clienteId' => 'Cliente',
+            'cliente' => 'Cliente',
             'monto' => 'Monto',
             'descripcion' => 'Descripcion',
             'productoId' => 'Producto',
@@ -105,10 +117,10 @@ class OrdenIngreso extends CustomCActiveRecord {
 
         $criteria->compare('id', $this->id);
         $criteria->compare('fecha', $this->fecha, true);
-        $criteria->compare('clienteId', $this->clienteId);
+        //$criteria->compare('clienteId', $this->clienteId);
         $criteria->compare('monto', $this->monto, true);
         $criteria->compare('descripcion', $this->descripcion, true);
-        $criteria->compare('productoId', $this->productoId, true);
+        //$criteria->compare('productoId', $this->productoId, true);
         $criteria->compare('estado', $this->estado);
         $criteria->compare('sucursalId', $this->sucursalId);
         $criteria->compare('userStamp', $this->userStamp, true);
@@ -156,5 +168,19 @@ class OrdenIngreso extends CustomCActiveRecord {
                     'criteria' => $criteria,
                 ));
     }
+
+    public function afterFind() {
+
+        if (isset($his->Productoctacte)) {
+            $this->pkModeloRelacionado = $this->Productoctacte->pkmodeloRelacionadoId;    
+            $this->productoId = $this->Productoctacte->productoId;
+        } else {
+            $this->pkModeloRelacionado = 0;
+        }        
+
+
+        return parent::afterFind();
+    }
+
 
 }

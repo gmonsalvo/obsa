@@ -45,10 +45,10 @@
 
 	<div class="row">
 		<?php
-			echo $form->labelEx($model, 'clienteId');
+			echo $form->labelEx($model, 'cliente');
 			$this->widget('EJuiAutoCompleteFkField', array(
 				  'model'=>$model, 
-				  'attribute'=>'clienteId', //the FK field (from CJuiInputWidget)
+				  'attribute'=>'pkModeloRelacionado', //the FK field (from CJuiInputWidget)
 				  // controller method to return the autoComplete data (from CJuiAutoComplete)
 				  'sourceUrl'=>Yii::app()->createUrl('/clientes/buscarRazonSocial'), 
 				  // defaults to false.  set 'true' to display the FK field with 'readonly' attribute.
@@ -68,7 +68,7 @@
 				  ),
 				  'onSelectScript'=>CHtml::ajax(array('type'=>'POST', 'url'=>array("ordenIngreso/cargarProductosCliente"), 'update'=>'#OrdenIngreso_productoId')),
 			 ));
-			 echo $form->error($model, 'clienteId');
+			 echo $form->error($model, 'cliente');
 		?>
 	</div>
 	
