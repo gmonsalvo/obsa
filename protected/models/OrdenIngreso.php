@@ -27,6 +27,7 @@ class OrdenIngreso extends CustomCActiveRecord {
 
 	public $nombreCliente;
 	public $cliente;
+    public $producto;
 	public $pkModeloRelacionado;
 	public $productoId;
 	public $clienteId;
@@ -73,18 +74,23 @@ class OrdenIngreso extends CustomCActiveRecord {
         return array(
 
             'sucursal' => array(self::BELONGS_TO, 'Sucursales', 'sucursalId'),
-            
-            'productosCliente' => array(self::HAS_MANY, 'Productoctacte', 'pkModeloRelacionado'),
-            'productos' => array(self::HAS_MANY, 'Productos', 'productoId', 'through' => 'productosCliente'),
-            'cliente' => array(self::HAS_MANY, 'Clientes', 'pkModeloRelacionado', 'through' => 'productosCliente'),
 
             'productoCtaCte' => array(self::BELONGS_TO, 'Productoctacte', 'productoCtaCteId',),
-            'productoCtaCte2' => array(self::BELONGS_TO, 'Productoctacte', 'pkModeloRelacionado',),
+            
 
-            'producto' => array(self::HAS_ONE, 'Productos','productoId',
-                            'through'=>'productoCtaCte2', 
-                            'condition' => 'productoCtaCte2.productoId=producto.id',
-                            ),
+/*            'productosCliente' => array(self::HAS_MANY, 'Productoctacte', 'pkModeloRelacionado'),
+            
+            'productos' => array(self::HAS_MANY, 'Productos', 'productoId', 'through' => 'productosCliente'),
+  */          
+            /*'cliente' => array(self::HAS_MANY, 'Clientes', 
+                            array('id' => 'pkModeloRelacionado'), 
+                            'through' => 'productoCtaCte'),
+            */
+            
+          /*  'productoCtaCte2' => array(self::BELONGS_TO, 'Productoctacte', 'pkModeloRelacionado',),*/
+            /*'producto' => array(self::HAS_ONE, 'Productos','productoId',
+                            'through'=>'productoCtaCte', 
+                            ),*/
         );
     }
 
@@ -173,9 +179,31 @@ class OrdenIngreso extends CustomCActiveRecord {
 
     public function afterFind() {
 
-        if (isset($his->Productoctacte)) {
-            $this->pkModeloRelacionado = $this->Productoctacte->pkmodeloRelacionadoId;    
-            $this->productoId = $this->Productoctacte->productoId;
+        if (isset($this->productoCtaCte)) {
+            $this->pkModeloRelacionado = $this->productoCtaCte->pkModeloRelacionado;
+            $this->productoId = $this->productoCtaCte->productoId;
+
+            /*$sql = "SELECT c.* FROM clientes c left join productoctacte p 
+                    on (c.id = p.pkmodelorelacionado and nombreModelo = 'Clientes')
+                where c.id = :id";
+            $command = Yii::app()->db->createCommand($sql);
+            $command->bindValue(":id", $this->pkModeloRelacionado, PDO::PARAM_STR);
+
+            $this->cliente = $command->queryRow();
+            if (isset($this->cliente)) {
+                $this->cliente = 1;
+            } else {                
+                $this->cliente = new Clientes;
+            }*/
+
+            //if ($this->productoCtaCte->nombreModelo='Clientes') {
+                $this->cliente = Clientes::model()->findByPk($this->pkModeloRelacionado);
+                $this->producto = Productos::model()->findByPk($this->productoId);
+            //} else {
+            //    $this->financiera = Financieras::model()->findByPk($this->pkModeloRelacionado);
+            //}
+
+            
         } else {
             $this->pkModeloRelacionado = 0;
         }        

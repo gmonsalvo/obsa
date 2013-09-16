@@ -295,7 +295,7 @@ class Clientes extends CustomCActiveRecord {
         return $this->montoColocaciones;
     }
 
-     public function afterFind() {
+    public function afterFind() {
           $this->razonSocial =ucwords(strtolower($this->razonSocial));
 
        return parent::afterFind();

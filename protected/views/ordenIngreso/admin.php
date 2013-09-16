@@ -63,12 +63,11 @@ $this->widget('zii.widgets.grid.CGridView', array(
             'class' => 'CCheckBoxColumn',
         ),
 		'fecha',
-/*        array(
+        array(
             'name' => 'clienteId',
             'header' => 'Cliente',
             'value' => '$data->cliente->razonSocial',
         ),
-        */
 		array(
             'name' => 'productoId',
             'header' => 'Producto',
