@@ -213,6 +213,14 @@ class OrdenIngresoController extends Controller
 		foreach($cliente->productos as $producto)
 			echo CHtml::tag('option', array('value'=>$producto->id),CHtml::encode($producto->nombre),true);
 	}
+
+	public function actionCargarProductosFinanciera() {
+		
+		$cliente = Financieras::model()->findByPk($_POST['OrdenIngreso']['financieraId']); //buscarProductosCliente($_POST['OrdenIngreso']['clienteId']);
+		
+		foreach($cliente->productos as $producto)
+			echo CHtml::tag('option', array('value'=>$producto->id),CHtml::encode($producto->nombre),true);
+	}
 	
 	////// Métodos generados
 	
@@ -245,7 +253,7 @@ class OrdenIngresoController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update'),
+				'actions'=>array('create','update','createF'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -403,5 +411,40 @@ class OrdenIngresoController extends Controller
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}
+	}
+
+	/*
+	* Creación de Ordenes de Ingreso para Financieras.
+	*/
+	public function actionCreateF()
+	{
+		$model=new OrdenIngreso;
+
+		// Uncomment the following line if AJAX validation is needed
+		// $this->performAjaxValidation($model);
+		
+		if(isset($_POST['OrdenIngreso']))
+		{
+			$model->attributes=$_POST['OrdenIngreso'];
+			
+			$productoCliente = Productoctacte::model()->find("pkModeloRelacionado=:financieraId AND productoId=:productoId AND nombreModelo=:nombreModelo", array(":financieraId" => $_POST['OrdenIngreso']['clienteId'], ":productoId" => $_POST['OrdenIngreso']['productoId'], ":nombreModelo" => "Clientes"));
+			
+			if (!$productoCliente)
+				return false;
+			
+			$model->productoCtaCteId = $productoCliente->id;
+			
+			if($model->save())
+			    Yii::app()->user->setFlash('success','Ingreso de Fondos realizado con exito');
+				$model->unsetAttributes();
+				$this->redirect('createF',array(
+					'model'=>$model,
+					));
+
+		}
+
+		$this->render('createF',array(
+			'model'=>$model,
+		));
 	}
 }

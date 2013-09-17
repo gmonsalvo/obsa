@@ -27,6 +27,7 @@ class OrdenIngreso extends CustomCActiveRecord {
 
 	public $nombreCliente;
 	public $cliente;
+    public $financiera;
     public $producto;
 	public $pkModeloRelacionado;
 	public $productoId;
@@ -88,6 +89,7 @@ class OrdenIngreso extends CustomCActiveRecord {
             'id' => 'ID',
             'fecha' => 'Fecha',
             'cliente' => 'Cliente',
+            'financiera' => 'Financiera',
             'monto' => 'Monto',
             'descripcion' => 'Descripcion',
             'productoId' => 'Producto',

@@ -64,7 +64,7 @@
                             array('label' => 'Financieras', 'url' => array(''),
                                 'items' => array(
                                     array('label' => 'Adm. Financieras', 'url' => array('/financieras/admin')),
-                                    array('label' => 'Depositos', 'url' => array('/ctacteProveedores/create')),
+                                    array('label' => 'Depositos', 'url' => array('/ordenIngreso/createF')),
                                     array('label' => 'Retiros', 'url' => array('/ctacteProveedores/admin')),
                                     array('label' => 'Cuenta Corriente', 'url' => array('/ordenesPagoProveedores/create')),
                                     array('label' => 'Conciliacion Diaria', 'url' => array('/ordenesPagoProveedores/create')),

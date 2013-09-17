@@ -146,6 +146,8 @@ class FinancierasController extends Controller
 				
 		if(isset($_POST['Financieras'])) {
 			$model->attributes=$_POST['Financieras'];
+
+			//$tst = $model->responsables ;
 			
 			$data=array();
 			
@@ -169,7 +171,7 @@ class FinancierasController extends Controller
 				
 				$error = false;
 				
-				if ($productos)
+				if (isset($productos)) {		
 					foreach ($productos as $idproducto) {
 						$relacion = new Productoctacte();
 						$relacion->nombreModelo = 'Financieras';
@@ -179,16 +181,18 @@ class FinancierasController extends Controller
 				        $relacion->timeStamp = Date("Y-m-d h:m:s");
 						if (!$relacion->save()) {
 							$error = true;
+							$model->addErrors($relacion->getErrors());							
 							break;
 						}
 					}
-				
+				}
 				if (!$error) {
 					$transaccion->commit();
 					$this->redirect(array('view','id'=>$model->id));
-				}
-				else
+				} else {
 					$transaccion->rollBack();
+					//$model->addErrors($relacion->getErrors());
+				}
 			}			
 		}
 
@@ -381,4 +385,36 @@ class FinancierasController extends Controller
 			Yii::app()->end();
 		}
 	}
+
+	// data provider para el campo de autocompletado buscnado por razonSocial y tomando el clienteId
+    public function actionBuscarNombre() {
+    	
+        $q = $_GET['term'];
+        if (isset($q)) {
+            $criteria = new CDbCriteria;
+
+            $criteria->compare('nombre', $q, true);
+            //$criteria->condition = ' UCASE(razonSocial) like :q';
+            $criteria->order = 'nombre'; // correct order-by field
+            $criteria->limit = 50;
+            //$criteria->params = array(':q' => '%' . strtoupper(trim($q)) . '%');
+            $financieras = Financieras::model()->findAll($criteria);
+
+            if (!empty($financieras)) {
+                $out = array();
+                foreach ($financieras as $c) {
+                    $out[] = array(
+                        'label' => $c->nombre,
+                        'value' => $c->nombre,
+                        'id' => $c->id,
+                    );
+                }
+
+                echo CJSON::encode($out);
+                Yii::app()->end();
+            } else {
+                echo "La consulta no devolvio resultados";
+            }
+        }
+    }
 }

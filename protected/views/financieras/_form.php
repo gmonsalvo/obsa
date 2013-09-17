@@ -95,8 +95,12 @@
 					//echo var_dump($model->responsables);
 					foreach($model->responsables as $record)
 						//echo var_dump($record);
-						if ($record)
-							$ids[] = $record->id ;
+						if ($record) {
+							if (isset($record->id)) {
+								$ids[] = $record->id ;
+							}
+							
+						}
 				}
 				
 				$responsablesDisponibles = Responsables::model()->responsablesDisponibles($ids);
