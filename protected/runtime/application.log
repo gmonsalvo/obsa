@@ -6829,3 +6829,125 @@ Stack trace:
 #21 C:\wamp\www\yii\framework\base\CApplication.php(155): CWebApplication->processRequest()
 #22 C:\wamp\www\capadv\index.php(13): CApplication->run()
 #23 {main} REQUEST_URI=/capadv/index.php/flujoFondos/admin
+2013/09/13 22:40:58 [trace] [system.CModule] Loading "log" application component
+in D:\Proyectos\www\obsa\index.php (14)
+2013/09/13 22:40:58 [trace] [system.CModule] Loading "request" application component
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\YiiDebugToolbarRoute.php (123)
+in D:\Proyectos\www\obsa\index.php (14)
+2013/09/13 22:40:58 [trace] [system.CModule] Loading "viewRenderer" application component
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\panels\YiiDebugToolbarPanelViewsRendering.php (35)
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\YiiDebugToolbar.php (198)
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\YiiDebugToolbar.php (127)
+2013/09/13 22:40:58 [trace] [system.CModule] Loading "db" application component
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\panels\YiiDebugToolbarPanelSql.php (46)
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\YiiDebugToolbar.php (192)
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\YiiDebugToolbar.php (127)
+2013/09/13 22:40:58 [trace] [system.db.CDbConnection] Opening DB connection
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\panels\YiiDebugToolbarPanelSql.php (46)
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\YiiDebugToolbar.php (192)
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\YiiDebugToolbar.php (127)
+2013/09/13 22:40:58 [trace] [system.CModule] Loading "clientScript" application component
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\YiiDebugToolbar.php (158)
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\YiiDebugToolbar.php (128)
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\YiiDebugToolbarRoute.php (145)
+2013/09/13 22:40:58 [trace] [system.CModule] Loading "assetManager" application component
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\YiiDebugToolbar.php (96)
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\YiiDebugToolbar.php (165)
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\YiiDebugToolbar.php (128)
+2013/09/13 22:40:58 [trace] [system.CModule] Loading "urlManager" application component
+in D:\Proyectos\www\obsa\index.php (14)
+2013/09/13 22:40:58 [trace] [system.web.filters.CFilterChain] Running filter OrdenIngresoController.filteraccessControl()
+in D:\Proyectos\www\obsa\index.php (14)
+2013/09/13 22:40:58 [trace] [system.CModule] Loading "user" application component
+in D:\Proyectos\www\obsa\index.php (14)
+2013/09/13 22:40:58 [trace] [system.CModule] Loading "session" application component
+in D:\Proyectos\www\obsa\index.php (14)
+2013/09/13 22:40:58 [trace] [system.db.CDbCommand] Querying SQL: SHOW COLUMNS FROM `ordenIngreso`
+in D:\Proyectos\www\obsa\protected\controllers\OrdenIngresoController.php (368)
+in D:\Proyectos\www\obsa\index.php (14)
+2013/09/13 22:40:58 [trace] [system.db.CDbCommand] Querying SQL: SHOW CREATE TABLE `ordenIngreso`
+in D:\Proyectos\www\obsa\protected\controllers\OrdenIngresoController.php (368)
+in D:\Proyectos\www\obsa\index.php (14)
+2013/09/13 22:40:59 [trace] [system.CModule] Loading "widgetFactory" application component
+in D:\Proyectos\www\obsa\protected\views\ordenIngreso\admin.php (90)
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\components\YiiDebugViewRenderer.php (43)
+in D:\Proyectos\www\obsa\protected\controllers\OrdenIngresoController.php (379)
+2013/09/13 22:40:59 [trace] [system.db.ar.CActiveRecord] OrdenIngreso.count()
+in D:\Proyectos\www\obsa\protected\views\ordenIngreso\admin.php (90)
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\components\YiiDebugViewRenderer.php (43)
+in D:\Proyectos\www\obsa\protected\controllers\OrdenIngresoController.php (379)
+2013/09/13 22:40:59 [trace] [system.db.CDbCommand] Querying SQL: SELECT COUNT(*) FROM `ordenIngreso` `t` WHERE (t.sucursalId=:sucursalId) AND (estado=:estado). Bound with :sucursalId='1', :estado=0
+in D:\Proyectos\www\obsa\protected\views\ordenIngreso\admin.php (90)
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\components\YiiDebugViewRenderer.php (43)
+in D:\Proyectos\www\obsa\protected\controllers\OrdenIngresoController.php (379)
+2013/09/13 22:40:59 [trace] [system.db.ar.CActiveRecord] OrdenIngreso.findAll()
+in D:\Proyectos\www\obsa\protected\views\ordenIngreso\admin.php (90)
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\components\YiiDebugViewRenderer.php (43)
+in D:\Proyectos\www\obsa\protected\controllers\OrdenIngresoController.php (379)
+2013/09/13 22:40:59 [trace] [system.db.CDbCommand] Querying SQL: SELECT * FROM `ordenIngreso` `t` WHERE (t.sucursalId=:sucursalId) AND (estado=:estado) LIMIT 10. Bound with :sucursalId='1', :estado=0
+in D:\Proyectos\www\obsa\protected\views\ordenIngreso\admin.php (90)
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\components\YiiDebugViewRenderer.php (43)
+in D:\Proyectos\www\obsa\protected\controllers\OrdenIngresoController.php (379)
+2013/09/13 22:40:59 [trace] [system.CModule] Loading "coreMessages" application component
+in D:\Proyectos\www\obsa\protected\views\ordenIngreso\admin.php (90)
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\components\YiiDebugViewRenderer.php (43)
+in D:\Proyectos\www\obsa\protected\controllers\OrdenIngresoController.php (379)
+2013/09/13 22:40:59 [trace] [system.db.ar.CActiveRecord] lazy loading OrdenIngreso.productoCtaCte
+in D:\Proyectos\www\obsa\protected\views\ordenIngreso\admin.php (90)
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\components\YiiDebugViewRenderer.php (43)
+in D:\Proyectos\www\obsa\protected\controllers\OrdenIngresoController.php (379)
+2013/09/13 22:40:59 [trace] [system.db.CDbCommand] Querying SQL: SHOW COLUMNS FROM `productoctacte`
+in D:\Proyectos\www\obsa\protected\views\ordenIngreso\admin.php (90)
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\components\YiiDebugViewRenderer.php (43)
+in D:\Proyectos\www\obsa\protected\controllers\OrdenIngresoController.php (379)
+2013/09/13 22:40:59 [trace] [system.db.CDbCommand] Querying SQL: SHOW CREATE TABLE `productoctacte`
+in D:\Proyectos\www\obsa\protected\views\ordenIngreso\admin.php (90)
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\components\YiiDebugViewRenderer.php (43)
+in D:\Proyectos\www\obsa\protected\controllers\OrdenIngresoController.php (379)
+2013/09/13 22:40:59 [trace] [system.db.CDbCommand] Querying SQL: SELECT `productoCtaCte`.`id` AS `t1_c0`, `productoCtaCte`.`nombreModelo` AS `t1_c1`, `productoCtaCte`.`pkModeloRelacionado` AS `t1_c2`, `productoCtaCte`.`productoId` AS `t1_c3`, `productoCtaCte`.`userStamp` AS `t1_c4`, `productoCtaCte`.`timeStamp` AS `t1_c5` FROM `productoctacte` `productoCtaCte`  WHERE (`productoCtaCte`.`id`=:ypl0). Bound with :ypl0=NULL
+in D:\Proyectos\www\obsa\protected\views\ordenIngreso\admin.php (90)
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\components\YiiDebugViewRenderer.php (43)
+in D:\Proyectos\www\obsa\protected\controllers\OrdenIngresoController.php (379)
+2013/09/13 22:40:59 [trace] [system.CModule] Loading "format" application component
+in D:\Proyectos\www\obsa\protected\views\ordenIngreso\admin.php (90)
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\components\YiiDebugViewRenderer.php (43)
+in D:\Proyectos\www\obsa\protected\controllers\OrdenIngresoController.php (379)
+2013/09/13 22:40:59 [error] [php] Trying to get property of non-object (D:\Proyectos\www\yii\framework\base\CComponent.php(607) : eval()'d code:1)
+Stack trace:
+#0 D:\Proyectos\www\yii\framework\zii\widgets\grid\CGridColumn.php(138): CDataColumn->renderDataCellContent()
+#1 D:\Proyectos\www\yii\framework\zii\widgets\grid\CGridView.php(517): CDataColumn->renderDataCell()
+#2 D:\Proyectos\www\yii\framework\zii\widgets\grid\CGridView.php(490): CGridView->renderTableRow()
+#3 D:\Proyectos\www\yii\framework\zii\widgets\grid\CGridView.php(400): CGridView->renderTableBody()
+#4 D:\Proyectos\www\yii\framework\zii\widgets\CBaseListView.php(158): CGridView->renderItems()
+#5 unknown(0): CGridView->renderSection()
+#6 D:\Proyectos\www\yii\framework\zii\widgets\CBaseListView.php(141): preg_replace_callback()
+#7 D:\Proyectos\www\yii\framework\zii\widgets\CBaseListView.php(126): CGridView->renderContent()
+#8 D:\Proyectos\www\yii\framework\web\CBaseController.php(174): CGridView->run()
+#9 D:\Proyectos\www\obsa\protected\views\ordenIngreso\admin.php(90): OrdenIngresoController->widget()
+#10 D:\Proyectos\www\yii\framework\web\CBaseController.php(127): require()
+#11 D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\components\YiiDebugViewRenderer.php(43): OrdenIngresoController->renderInternal()
+#12 D:\Proyectos\www\yii\framework\web\CBaseController.php(94): YiiDebugViewRenderer->renderFile()
+#13 D:\Proyectos\www\yii\framework\web\CController.php(870): OrdenIngresoController->renderFile()
+#14 D:\Proyectos\www\yii\framework\web\CController.php(783): OrdenIngresoController->renderPartial()
+#15 D:\Proyectos\www\obsa\protected\controllers\OrdenIngresoController.php(379): OrdenIngresoController->render()
+#16 D:\Proyectos\www\yii\framework\web\actions\CInlineAction.php(50): OrdenIngresoController->actionAdmin()
+#17 D:\Proyectos\www\yii\framework\web\CController.php(309): CInlineAction->runWithParams()
+#18 D:\Proyectos\www\yii\framework\web\filters\CFilterChain.php(134): OrdenIngresoController->runAction()
+#19 D:\Proyectos\www\yii\framework\web\filters\CFilter.php(41): CFilterChain->run()
+#20 D:\Proyectos\www\yii\framework\web\CController.php(1146): CAccessControlFilter->filter()
+#21 D:\Proyectos\www\yii\framework\web\filters\CInlineFilter.php(59): OrdenIngresoController->filterAccessControl()
+#22 D:\Proyectos\www\yii\framework\web\filters\CFilterChain.php(131): CInlineFilter->filter()
+#23 D:\Proyectos\www\yii\framework\web\CController.php(292): CFilterChain->run()
+#24 D:\Proyectos\www\yii\framework\web\CController.php(266): OrdenIngresoController->runActionWithFilters()
+#25 D:\Proyectos\www\yii\framework\web\CWebApplication.php(276): OrdenIngresoController->run()
+#26 D:\Proyectos\www\yii\framework\web\CWebApplication.php(135): CWebApplication->runController()
+#27 D:\Proyectos\www\yii\framework\base\CApplication.php(162): CWebApplication->processRequest()
+#28 D:\Proyectos\www\obsa\index.php(14): CWebApplication->run()
+REQUEST_URI=/obsa/index.php/ordenIngreso/admin
+in D:\Proyectos\www\obsa\protected\views\ordenIngreso\admin.php (90)
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\components\YiiDebugViewRenderer.php (43)
+in D:\Proyectos\www\obsa\protected\controllers\OrdenIngresoController.php (379)
+2013/09/13 22:40:59 [trace] [system.CModule] Loading "errorHandler" application component
+in D:\Proyectos\www\obsa\protected\views\ordenIngreso\admin.php (90)
+in D:\Proyectos\www\obsa\protected\extensions\yii-debug-toolbar\components\YiiDebugViewRenderer.php (43)
+in D:\Proyectos\www\obsa\protected\controllers\OrdenIngresoController.php (379)

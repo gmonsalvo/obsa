@@ -66,12 +66,12 @@ $this->widget('zii.widgets.grid.CGridView', array(
         array(
             'name' => 'clienteId',
             'header' => 'Cliente',
-            'value' => '$data->cliente->razonSocial',
+            'value' => '$data->productoCtaCte->cliente->razonSocial',
         ),
 		array(
             'name' => 'productoId',
             'header' => 'Producto',
-            'value' => '$data->producto->nombre',
+            'value' => '$data->productoCtaCte->producto->nombre',
         ),
         array(
             'name' => 'productoCtaCte',

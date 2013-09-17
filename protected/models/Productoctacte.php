@@ -80,7 +80,8 @@ class Productoctacte extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'ctactes' => array(self::HAS_MANY, 'Ctacte', 'productoCtaCteId'),
-			'financiera' => array(self::BELONGS_TO, 'Financieras', 'pkModeloRelacionado'),
+			'cliente' => array(self::BELONGS_TO, 'Clientes', 'pkModeloRelacionado', 'on' => ' cliente.id in (select pkModeloRelacionado from productoctacte where nombreModelo = \'Clientes\')'),
+			'financiera' => array(self::BELONGS_TO, 'Financieras', 'pkModeloRelacionado', 'on' => ' financiera.id in (select pkModeloRelacionado from productoctacte where nombreModelo = \'Financieras\')'),
 			'producto' => array(self::BELONGS_TO, 'Productos', 'productoId'),
 			'ordenIngreso' => array(self::HAS_MANY, 'OrdenIngreso', 'pkModeloRelacionado'),
 		);

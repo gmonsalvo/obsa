@@ -75,8 +75,14 @@ class OrdenIngreso extends CustomCActiveRecord {
 
             'sucursal' => array(self::BELONGS_TO, 'Sucursales', 'sucursalId'),
 
-            'productoCtaCte' => array(self::BELONGS_TO, 'Productoctacte', 'productoCtaCteId',),
+            'productoCtaCte' => array(self::BELONGS_TO, 'Productoctacte', 'productoCtaCteId'),
             
+			//'cliente' => array(self::HAS_ONE, 'Clientes', 'pkModeloRelacionado', 'through' => 'productoCtaCte'),			
+			//'financiera' => array(self::BELONGS_TO, 'Financieras', '', 'on'=>'productoCtaCte.pkModeloRelacionado = financiera.id AND productoCtaCte.nombreModelo = \'Financieras\''),
+			
+			//'cliente' => array(self::BELONGS_TO, 'Clientes', '', 'on'=>'productoCtaCte.pkModeloRelacionado = cliente.id AND productoCtaCte.nombreModelo = \'Clientes\''),
+            
+			//'producto' => array(self::HAS_ONE, 'Productos','productoId', 'through'=>'productoCtaCte',)			
 
 /*            'productosCliente' => array(self::HAS_MANY, 'Productoctacte', 'pkModeloRelacionado'),
             
@@ -148,6 +154,20 @@ class OrdenIngreso extends CustomCActiveRecord {
                 ));
     }
 
+    public function searchByEstadoTipo($estado, $tipo) {
+        $criteria = new CDbCriteria;
+        $criteria->condition = "estado=:estado";
+		$criteria->with = array('productoCtaCte');
+		$criteria->condition = "productoCtaCte.nombreModelo=:tipo";
+		//$criteria->compare('productoCtaCte.nombreModelo',$tipo);
+		$criteria->together = true;
+        $criteria->params = array(':estado' => $estado);
+		$criteria->params = array(':tipo' => $tipo);
+        return new CActiveDataProvider(get_class($this), array(
+                    'criteria' => $criteria,
+                ));
+    }
+
 
     public function behaviors() {
         return array('datetimeI18NBehavior2' => array('class' => 'ext.DateTimeI18NBehavior2'),
@@ -180,8 +200,8 @@ class OrdenIngreso extends CustomCActiveRecord {
     public function afterFind() {
 
         if (isset($this->productoCtaCte)) {
-            $this->pkModeloRelacionado = $this->productoCtaCte->pkModeloRelacionado;
-            $this->productoId = $this->productoCtaCte->productoId;
+            //$this->pkModeloRelacionado = $this->productoCtaCte->pkModeloRelacionado;
+            //$this->productoId = $this->productoCtaCte->productoId;
 
             /*$sql = "SELECT c.* FROM clientes c left join productoctacte p 
                     on (c.id = p.pkmodelorelacionado and nombreModelo = 'Clientes')
@@ -197,8 +217,8 @@ class OrdenIngreso extends CustomCActiveRecord {
             }*/
 
             //if ($this->productoCtaCte->nombreModelo='Clientes') {
-                $this->cliente = Clientes::model()->findByPk($this->pkModeloRelacionado);
-                $this->producto = Productos::model()->findByPk($this->productoId);
+                //$this->cliente = Clientes::model()->findByPk($this->pkModeloRelacionado);
+                //$this->producto = Productos::model()->findByPk($this->productoId);
             //} else {
             //    $this->financiera = Financieras::model()->findByPk($this->pkModeloRelacionado);
             //}
