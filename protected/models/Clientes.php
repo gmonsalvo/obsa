@@ -312,7 +312,10 @@ class Clientes extends CustomCActiveRecord {
 	
 	public function validarProductos($attribute, $params)
 	{
-    	if (count($this->productos) < 1)
+		
+		$productos = $_POST['Clientes']['productosId'];
+		
+    	if (count($productos) < 1)
 			$this->addError($attribute, $params['message']);
 	}
 		
