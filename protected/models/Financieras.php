@@ -49,6 +49,12 @@ class Financieras extends CActiveRecord
 			$this->addError($attribute, $params['message']);
 	}
 	
+	public function validarProductos($attribute, $params)
+	{
+    	if (count($this->productos) < 1)
+			$this->addError($attribute, $params['message']);
+	}
+	
 	////// Métodos generados
 	
 	/**
@@ -86,6 +92,7 @@ class Financieras extends CActiveRecord
 			array('tasaPromedio, tasaPesificacion', 'numerical', 'integerOnly'=>false),
 			array('tasaPromedio, tasaPesificacion', 'numerical', 'integerOnly'=>false),
 			array('responsables', 'validarResponsables', 'message'=>'Debe especificar al menos dos responsables para la financiera'),
+			array('productos', 'validarProductos', 'message'=>'Debe seleccionar al menos un producto para la financiera'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, nombre, direccion, telefono, tasaPromedio, diasClearing, tasaPesificacion, responsablesBusqueda, productosBusqueda, userStamp, timeStamp', 'safe', 'on'=>'search'),

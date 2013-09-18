@@ -310,6 +310,13 @@ class Clientes extends CustomCActiveRecord {
         return $this->porcentajeInversion;
     }
 	
+	public function validarProductos($attribute, $params)
+	{
+    	if (count($this->productos) < 1)
+			$this->addError($attribute, $params['message']);
+	}
+		
+	
 	////// Métodos generados	
 
     /**
@@ -345,6 +352,7 @@ class Clientes extends CustomCActiveRecord {
             array('tasaInversor', 'validateTasas'),
             array('documento','unique'),
             array('razonSocial','unique'),
+            array('productos', 'validarProductos', 'message'=>'Debe seleccionar al menos un producto para el cliente'),
             // The following rule is used by search().
             // Please remove those attributes that should not be searched.
             array('id, razonSocial, fijo, celular, direccion, localidadId, provinciaId, email, documento, tasaInversor, tipoCliente, operadorId, sucursalId, userStamp, timeStamp, tasaTomador, montoMaximoTomador, productosBusqueda', 'safe', 'on' => 'search'),

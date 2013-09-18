@@ -48,7 +48,7 @@
 			echo $form->labelEx($model, 'cliente');
 			$this->widget('EJuiAutoCompleteFkField', array(
 				  'model'=>$model, 
-				  'attribute'=>'pkModeloRelacionado', //the FK field (from CJuiInputWidget)
+				  'attribute'=>'clienteId', //the FK field (from CJuiInputWidget)
 				  // controller method to return the autoComplete data (from CJuiAutoComplete)
 				  'sourceUrl'=>Yii::app()->createUrl('/clientes/buscarRazonSocial'), 
 				  // defaults to false.  set 'true' to display the FK field with 'readonly' attribute.

@@ -39,8 +39,10 @@ $this->menu = array(
         return true;
     }
 
-    function MostrarInformacion(){
+    function MostrarInformacion(bandera){
         if($("#OrdenesPago_clienteId").val()==""){
+        	if (bandera)
+        		alert("Debe seleccionar un cliente");
             return false;
         } else {
             $.post("/obsa/index.php/clientes/getSaldos?render=false",{"id":$("#OrdenesPago_clienteId").val(), "productoId":$("#OrdenesPago_productoId").val()},function(data){
@@ -143,6 +145,10 @@ $this->menu = array(
             'onSelectScript'=>CHtml::ajax(array('type'=>'POST', 'url'=>array("ordenesPago/cargarProductosCliente"), 'update'=>'#OrdenesPago_productoId')),
         ));
         echo $form->error($model, 'clienteId');
+		
+		echo CHtml::button(CHtml::encode('Mostrar Información'),array('onclick'=>'MostrarInformacion(true)'));
+		
+		/*
         echo CHtml::ajaxButton('Mostrar informacion', CHtml::normalizeUrl(array('clientes/getSaldos', 'render' => false)), array(
             'type' => 'POST',
             'data' => array('id' => 'js:$("#OrdenesPago_clienteId").val()',
@@ -170,7 +176,7 @@ $this->menu = array(
                                 $("#botonSubmit").removeAttr("disabled");
                             }
              }',
-        ))
+        ))*/
         ?>
     </div>
 

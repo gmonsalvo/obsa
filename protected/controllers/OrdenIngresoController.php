@@ -17,9 +17,6 @@ class OrdenIngresoController extends Controller
             $id = $_POST["ordenIngresoId"];
             $ordenIngreso = $this->loadModel($id);
 			
-			print_r("2");
-			exit;
-			
             try {
                 if ($_POST["boton"] == "Acreditar Fondos") {
                     if($ordenIngreso->tipo == OrdenIngreso::TIPO_DEPOSITO) {
@@ -144,7 +141,7 @@ class OrdenIngresoController extends Controller
         $html = 'Fecha: ' . $model->fecha . '
                        <br/>
                        <br/>
-                       Cliente: ' . $model->cliente->razonSocial . '
+                       Cliente: ' . $model->productoCtaCte->cliente->razonSocial . '
                        <br/>
                        <br/>
                        Orden de Ingreso Nro: ' . $model->id . '

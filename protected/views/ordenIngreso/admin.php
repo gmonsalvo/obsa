@@ -1,8 +1,9 @@
 <?php
+/*
 $this->breadcrumbs = array(
     'Ordenes de Ingreso' => array('index'),
     'Manage',
-);
+);*/
 
 $this->menu = array(
     array('label' => 'Nueva Orden de Ingreso', 'url' => array('create')),
