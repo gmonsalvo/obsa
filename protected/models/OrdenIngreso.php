@@ -32,6 +32,7 @@ class OrdenIngreso extends CustomCActiveRecord {
 	public $pkModeloRelacionado;
 	public $productoId;
 	public $clienteId;
+    public $financieraId;
 
     /**
      * Returns the static model of the specified AR class.
