@@ -99,9 +99,9 @@ $this->widget('zii.widgets.grid.CGridView', array(
             'class' => 'CCheckBoxColumn',
         ),
         array(
-            'name' => 'clienteId',
+            'name' => 'productoCtaCte',
             'header' => 'Cliente',
-            'value' => '$data->cliente->razonSocial',
+            'value' => 'isset($data->productoCtaCte->cliente)?$data->productoCtaCte->cliente->razonSocial:""',
         ),
         'fecha',
         array(

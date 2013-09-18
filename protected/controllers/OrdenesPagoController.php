@@ -90,6 +90,15 @@ class OrdenesPagoController extends Controller {
             $model->estado = OrdenesPago::ESTADO_PENDIENTE;
             $model->origenOperacion = OrdenesPago::ORIGEN_OPERACION_COMPRA;
             $model->fecha = Utilities::MysqlDateFormat($model->fecha);
+
+            $productoCtaCte = Productoctacte::model()->find("pkModeloRelacionado=:clienteId AND productoId=:productoId AND nombreModelo=:nombreModelo", 
+                    array(":clienteId" => $_POST['OrdenesPago']['clienteId'], 
+                    ":productoId" => $_POST['OrdenesPago']['productoId'], ":nombreModelo" => "Clientes"));
+            if (!isset($productoCtaCte))
+                return false;
+
+            $model->productoCtaCteId = $productoCtaCte->id;
+
             $connection = Yii::app()->db;
             $transaction = $connection->beginTransaction();
             try {
@@ -647,6 +656,14 @@ class OrdenesPagoController extends Controller {
             $model->estado = OrdenesPago::ESTADO_PENDIENTE;
             $model->origenOperacion = OrdenesPago::ORIGEN_OPERACION_RETIRO_FONDOS;
             $model->descripcion = "RETIRO: ".$model->descripcion;
+
+            $productoCtaCte = Productoctacte::model()->find("pkModeloRelacionado=:clienteId AND productoId=:productoId AND nombreModelo=:nombreModelo", 
+                    array(":clienteId" => $_POST['OrdenesPago']['clienteId'], 
+                    ":productoId" => $_POST['OrdenesPago']['productoId'], ":nombreModelo" => "Clientes"));
+            if (!isset($productoCtaCte))
+                return false;
+
+            $model->productoCtaCteId = $productoCtaCte->id;
             //$model->monedaId = 2; //pesos
             //$model->tasaCambio = Monedas::model()->findByPk($model->monedaId)->tasaCambioVenta;
             $model->fecha = Utilities::MysqlDateFormat($model->fecha);
@@ -665,6 +682,7 @@ class OrdenesPagoController extends Controller {
 
                     $transaction->commit();
                     Yii::app()->user->setFlash('success', 'El retiro de fondos fue creado con exito');
+                    $model = new OrdenesPago;
                 }
             } catch (Exception $e) {
                 $transaction->rollback();

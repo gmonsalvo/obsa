@@ -39,10 +39,8 @@ $this->menu = array(
         return true;
     }
 
-    function MostrarInformacion(bandera){
+    function MostrarInformacion(){
         if($("#OrdenesPago_clienteId").val()==""){
-        	if (bandera)
-        		alert("Debe seleccionar un cliente");
             return false;
         } else {
             $.post("/obsa/index.php/clientes/getSaldos?render=false",{"id":$("#OrdenesPago_clienteId").val(), "productoId":$("#OrdenesPago_productoId").val()},function(data){
@@ -123,9 +121,10 @@ $this->menu = array(
             'model' => $model,
             'attribute' => 'clienteId', //the FK field (from CJuiInputWidget)
             // controller method to return the autoComplete data (from CJuiAutoComplete)
-            'sourceUrl' => Yii::app()->createUrl('/clientes/buscarRazonSocial',array("tipo[0]"=>  Clientes::TYPE_INVERSOR,"tipo[1]"=>Clientes::TYPE_TOMADOR_E_INVERSOR)),
+            'sourceUrl' => Yii::app()->createUrl('/clientes/buscarRazonSocial',
+                                    array("tipo[0]"=>  Clientes::TYPE_INVERSOR,"tipo[1]"=>Clientes::TYPE_TOMADOR_E_INVERSOR)),
             // defaults to false.  set 'true' to display the FK field with 'readonly' attribute.
-            'showFKField' => false,
+            'showFKField' => true,
             // display size of the FK field.  only matters if not hidden.  defaults to 10
             'FKFieldSize' => 15,
             'relName' => 'cliente', // the relation name defined above
@@ -145,10 +144,6 @@ $this->menu = array(
             'onSelectScript'=>CHtml::ajax(array('type'=>'POST', 'url'=>array("ordenesPago/cargarProductosCliente"), 'update'=>'#OrdenesPago_productoId')),
         ));
         echo $form->error($model, 'clienteId');
-		
-		echo CHtml::button(CHtml::encode('Mostrar Información'),array('onclick'=>'MostrarInformacion(true)'));
-		
-		/*
         echo CHtml::ajaxButton('Mostrar informacion', CHtml::normalizeUrl(array('clientes/getSaldos', 'render' => false)), array(
             'type' => 'POST',
             'data' => array('id' => 'js:$("#OrdenesPago_clienteId").val()',
@@ -176,7 +171,7 @@ $this->menu = array(
                                 $("#botonSubmit").removeAttr("disabled");
                             }
              }',
-        ))*/
+        ))
         ?>
     </div>
 

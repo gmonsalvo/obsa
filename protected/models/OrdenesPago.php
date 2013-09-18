@@ -14,7 +14,6 @@
  * @property string $porcentajePesificacion
  * @property string $origenOperacion
  * @property integer $sucursalId
-
  * @property string $tasaCambio
  * @property string $userStamp
  * @property string $timeStamp
@@ -29,11 +28,13 @@ class OrdenesPago extends CustomCActiveRecord {
 
     private $saldo;
     private $montoCheques;
+    public $cliente;
+    public $clienteId;
+    public $productoId;
 	
     /**
      * Returns the static model of the specified AR class.
      * @return OrdenesPago the static model class
-
      */
     const ESTADO_PENDIENTE=0;
     const ESTADO_PAGADA=1;
@@ -83,12 +84,11 @@ class OrdenesPago extends CustomCActiveRecord {
         // class name for the relations automatically generated below.
         return array(
             'formaPagoOrdens' => array(self::HAS_MANY, 'FormaPagoOrden', 'ordenPagoId'),
-            'cliente' => array(self::BELONGS_TO, 'Clientes', 'clienteId'),
-            'producto' => array(self::BELONGS_TO, 'Productos', 'productoId'),
             'sucursal' => array(self::BELONGS_TO, 'Sucursales', 'sucursalId'),
             'operacionesChequeOrdenPago'=>array(self::HAS_ONE, 'OperacionesChequeOrdenPago','ordenPagoId'),
             'recibos' => array(self::HAS_MANY, 'RecibosOrdenPago', 'ordenPagoId'),
             'totalMontoRecibos' => array(self::STAT, 'RecibosOrdenPago', 'ordenPagoId','select'=> 'SUM(montoTotal)'),
+            'productoCtaCte' => array(self::BELONGS_TO, 'Productoctacte', 'productoCtaCteId'),
         );
     }
 
@@ -122,8 +122,8 @@ class OrdenesPago extends CustomCActiveRecord {
         $criteria = new CDbCriteria;
 
         $criteria->compare('id', $this->id);
-        $criteria->compare('clienteId', $this->clienteId);
-		$criteria->compare('productoId', $this->productoId);
+        //$criteria->compare('clienteId', $this->clienteId);
+		//$criteria->compare('productoId', $this->productoId);
         $criteria->compare('fecha', $this->fecha, true);
         $criteria->compare('monto', $this->monto, true);
         $criteria->compare('descripcion', $this->descripcion, true);
