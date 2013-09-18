@@ -18,11 +18,12 @@ class OrdenIngresoController extends Controller
             $ordenIngreso = $this->loadModel($id);
 			
 			print_r("2");
-			exit;
+			print_r($_POST["boton"]);
+			//exit;
 			
             try {
                 if ($_POST["boton"] == "Acreditar Fondos") {
-                    if($ordenIngreso->tipo == OrdenIngreso::TIPO_DEPOSITO) {
+                    if ($ordenIngreso->tipo == OrdenIngreso::TIPO_DEPOSITO) {
 	                    //metemos un credito en cuenta corriente para este cliente
 						$sql = "INSERT INTO ctacte
 	                            (tipoMov, productoCtaCteId, conceptoId, descripcion, monto, fecha, origen, identificadorOrigen, userStamp, timeStamp, sucursalId, saldoAcumulado)
@@ -144,7 +145,7 @@ class OrdenIngresoController extends Controller
         $html = 'Fecha: ' . $model->fecha . '
                        <br/>
                        <br/>
-                       Cliente: ' . $model->cliente->razonSocial . '
+                       Cliente: ' . $model->productoCtaCte->cliente->razonSocial . '
                        <br/>
                        <br/>
                        Orden de Ingreso Nro: ' . $model->id . '
@@ -216,7 +217,7 @@ class OrdenIngresoController extends Controller
 
 	public function actionCargarProductosFinanciera() {
 		
-		$cliente = Financieras::model()->findByPk($_POST['OrdenIngreso']['financieraId']); //buscarProductosCliente($_POST['OrdenIngreso']['clienteId']);
+		$cliente = Financieras::model()->findByPk($_POST['OrdenIngreso']['pkModeloRelacionado']); //buscarProductosCliente($_POST['OrdenIngreso']['clienteId']);
 		
 		foreach($cliente->productos as $producto)
 			echo CHtml::tag('option', array('value'=>$producto->id),CHtml::encode($producto->nombre),true);
@@ -257,7 +258,7 @@ class OrdenIngresoController extends Controller
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('admin','delete','updateOrden','reciboPDF','levantarCheque', "prueba", "cargarProductosCliente"),
+				'actions'=>array('admin','delete','updateOrden','reciboPDF','levantarCheque', "prueba", "cargarProductosCliente", "cargarProductosFinanciera"),
 				'users'=>array('@'),
 			),
 			array('deny',  // deny all users
@@ -427,12 +428,15 @@ class OrdenIngresoController extends Controller
 		{
 			$model->attributes=$_POST['OrdenIngreso'];
 			
-			$productoCliente = Productoctacte::model()->find("pkModeloRelacionado=:financieraId AND productoId=:productoId AND nombreModelo=:nombreModelo", array(":financieraId" => $_POST['OrdenIngreso']['clienteId'], ":productoId" => $_POST['OrdenIngreso']['productoId'], ":nombreModelo" => "Clientes"));
+			$productoFinanciera = Productoctacte::model()->find(
+							"pkModeloRelacionado=:financieraId AND productoId=:productoId AND nombreModelo=:nombreModelo", 
+							array(":financieraId" => $_POST['OrdenIngreso']['pkModeloRelacionado'],
+							 ":productoId" => $_POST['OrdenIngreso']['productoId'], ":nombreModelo" => "Financieras"));
 			
-			if (!$productoCliente)
+			if (!$productoFinanciera)
 				return false;
 			
-			$model->productoCtaCteId = $productoCliente->id;
+			$model->productoCtaCteId = $productoFinanciera->id;
 			
 			if($model->save())
 			    Yii::app()->user->setFlash('success','Ingreso de Fondos realizado con exito');

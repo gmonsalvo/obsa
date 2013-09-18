@@ -66,7 +66,12 @@ $this->widget('zii.widgets.grid.CGridView', array(
         array(
             'name' => 'clienteId',
             'header' => 'Cliente',
-            'value' => '$data->productoCtaCte->cliente->razonSocial',
+            'value' => 'isset($data->productoCtaCte->cliente)?$data->productoCtaCte->cliente->razonSocial:"" ',
+        ),
+        array(
+            'name' => 'financieraId',
+            'header' => 'Financiera',
+            'value' => 'isset($data->productoCtaCte->financiera)?$data->productoCtaCte->financiera->nombre:"" ',
         ),
 		array(
             'name' => 'productoId',
