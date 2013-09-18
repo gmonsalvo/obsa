@@ -51,7 +51,9 @@ class Financieras extends CActiveRecord
 	
 	public function validarProductos($attribute, $params)
 	{
-    	if (count($this->productos) < 1)
+		$productos = $_POST['Financieras']['productosId'];
+		
+    	if (count($productos) < 1)
 			$this->addError($attribute, $params['message']);
 	}
 	
