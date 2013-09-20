@@ -30,6 +30,8 @@ class OperacionesCheques extends CustomCActiveRecord {
     private $montoPesificacion=0;
     private $montoIntereses=0;
     private $montoNominalTotal=0;
+	
+	public $productoId;
     /**
      * Returns the static model of the specified AR class.
      * @return OperacionesCheques the static model class
@@ -86,6 +88,7 @@ class OperacionesCheques extends CustomCActiveRecord {
             'id' => 'ID',
             'operadorId' => 'Operador',
             'clienteId' => 'Cliente',
+            'productoId' => 'Producto',
             'montoNetoTotal' => 'Monto Neto Total',
             'fecha' => 'Fecha',
             'userStamp' => 'User Stamp',
