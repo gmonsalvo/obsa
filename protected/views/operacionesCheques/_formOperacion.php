@@ -1,16 +1,19 @@
 <?php
-if (isset($_POST['operadorId']) && isset($_POST['clienteId']) && isset($_POST['fecha'])) {
+if (isset($_POST['operadorId']) && isset($_POST['clienteId']) && isset($_POST['fecha']) && isset($_POST['productoId'])) {
     $operadorId = $_POST['operadorId'];
     $clienteId = $_POST['clienteId'];
+	$productoId = $_POST['productoId'];
     $fecha = $_POST['fecha'];
 } else {
-    if (isset($_GET['operadorId']) && isset($_GET['clienteId']) && isset($_GET['fecha'])) {
+    if (isset($_GET['operadorId']) && isset($_GET['clienteId']) && isset($_GET['fecha']) && isset($_GET['productoId'])) {
         $operadorId = $_GET['operadorId'];
         $clienteId = $_GET['clienteId'];
+		$productoId = $_GET['productoId'];
         $fecha = $_GET['fecha'];
     } else {
         $operadorId = '';
         $clienteId = '';
+		$productoId = '';
         $fecha = Date('d/m/Y');
     }
 }
@@ -207,6 +210,14 @@ if (count($tmpcheque->getErrors()) > 0) {
 }
 ?>
 
+
+<?php
+    $form = $this->beginWidget('CActiveForm', array(
+        'id' => 'tmp-cheques-cliente-form',
+        'enableAjaxValidation' => true,
+    ));
+?>
+
 <div class="form">
     <p class="note">Campos con <span class="required">*</span> son requeridos.</p>
 
@@ -262,16 +273,34 @@ if (count($tmpcheque->getErrors()) > 0) {
                         // autoCompleter returns a value, defaults to 2
                         'minLength' => 1,
                     ),
-                    'select' => 'getDatosCliente();',
+                    //'select' => 'getDatosCliente();',
                     'htmlOptions' => array(
                         'tabindex' => 1),
+                    'onSelectScript'=>CHtml::ajax(array('type'=>'POST', 'url'=>array("operacionesCheques/cargarProductosCliente"), 'update'=>'#OperacionesCheques_productoId')),
                 ));
-                ?>
+            ?>
             </td>
+			<td>
+				<?php echo $form->labelEx($model,'productoId'); ?>
+			</td>
+			<td>
+				<?php echo $form->dropDownList($model, 'productoId', array(), array('empty' => 'Seleccionar un producto')) ?>				
+			</td>
         </tr>
     </table>
-
 </div><!-- form -->
+
+<?php 
+if ($model->clienteId) {
+	echo "<script>";
+	echo CHtml::ajax(array('type'=>'POST', 'url'=>array("operacionesCheques/cargarProductosCliente"), 'data'=>array("OperacionesCheques[clienteId]"=>$model->clienteId), 'update'=>'#OperacionesCheques_productoId'));
+	echo "</script>";
+}
+?>
+
+
+<?php $this->endWidget(); ?>
+
 <div id="chequestemporales">
     <?php
     Yii::app()->clientScript->registerScript('search', "
@@ -615,6 +644,7 @@ $('.search-form form').submit(function(){
 
         <?php echo $form->hiddenField($model, 'fecha', array('id'=>'fecha','value' => date("d-m-Y"))); ?>
         <?php echo $form->hiddenField($model, 'clienteId', array("id"=>"clienteId",'value' => '')); ?>
+        <?php echo $form->hiddenField($model, 'productoId', array("id"=>"productoId",'value' => '')); ?>
     <div class="row buttons">
         <?php echo CHtml::submitButton('Crear Operacion'); ?>
     </div>
@@ -622,4 +652,3 @@ $('.search-form form').submit(function(){
     <?php $this->endWidget(); ?>
 
 </div><!-- form -->
-

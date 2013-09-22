@@ -2,6 +2,34 @@
 
 class OperacionesChequesController extends Controller {
 
+	////// Propiedades
+	
+	////// Métodos Nuevos
+	
+	public function actionCargarProductosCliente() {
+		
+		$cliente = Clientes::model()->findByPk($_POST['OperacionesCheques']['clienteId']); 
+		
+		$i = -9999999;
+		
+		foreach($cliente->productos as $producto) {
+			if ($i == -9999999)
+				$i = $producto->id;
+			echo CHtml::tag('option', array('value'=>$producto->id),CHtml::encode($producto->nombre),true);
+		}
+		
+		echo "<script>";
+		if($cliente->tasaTomador != "")
+			echo "$('#TmpCheques_tasaDescuento').val(".$cliente->tasaTomador.");";
+        if($cliente->tasaPesificacionTomador != "")
+            echo "$('#TmpCheques_pesificacion').val(".$cliente->tasaPesificacionTomador.");";
+		echo "$('#clienteId').val($('#OperacionesCheques_clienteId').val());";
+		echo "$('#productoId').val('".$i."');";
+		echo "</script>";
+	}
+		
+	////// Métodos Generados
+
     /**
      * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
      * using two-column layout. See 'protected/views/layouts/column2.php'.
@@ -29,7 +57,7 @@ class OperacionesChequesController extends Controller {
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions' => array('create', 'update', 'admin', 'nuevaOperacion', 'generatePDF', 'ResumenPDF','imprimirPDF','anularOperacion'),
+                'actions' => array('create', 'update', 'admin', 'nuevaOperacion', 'generatePDF', 'ResumenPDF','imprimirPDF','anularOperacion', 'cargarProductosCliente'),
                 'users' => array('@'),
             ),
             array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -171,20 +199,24 @@ class OperacionesChequesController extends Controller {
                     //borro los registros temporales
                     $command->delete('tmpCheques', 'DATE(timeStamp)=:fechahoy AND userStamp=:username AND presupuesto=0', array(':fechahoy' => Date('Y-m-d'), ':username' => Yii::app()->user->model->username));
                     
-                    $ctacteCliente = new CtacteClientes();
-                    $ctacteCliente->tipoMov = CtacteClientes::TYPE_CREDITO;
-                    $ctacteCliente->conceptoId = 12;
-                    $ctacteCliente->clienteId = $model->clienteId;
-                    $ctacteCliente->productoId = 1;
-                    $ctacteCliente->descripcion = "Credito por la compra de cheques";
+					$transaction->rollBack();
+					print_r($_POST);
+					exit;
+					
+                    $ctacte = new Ctacte();
+                    $ctacte->tipoMov = Ctacte::TYPE_CREDITO;
+                    $ctacte->conceptoId = 12;
+                    $ctacte->clienteId = $model->clienteId;
+                    $ctacte->productoId = 1;
+                    $ctacte->descripcion = "Credito por la compra de cheques";
 
-                    $ctacteCliente->monto = $model->montoNetoTotal;
-                    $ctacteCliente->saldoAcumulado=$ctacteCliente->getSaldoAcumuladoActual()+$ctacteCliente->monto;
-                    $ctacteCliente->fecha = date("Y-m-d");
-                    $ctacteCliente->origen = "OperacionesCheques";
-                    $ctacteCliente->identificadorOrigen = $model->id;
+                    $ctacte->monto = $model->montoNetoTotal;
+                    $ctacte->saldoAcumulado=$ctacteCliente->getSaldoAcumuladoActual()+$ctacteCliente->monto;
+                    $ctacte->fecha = date("Y-m-d");
+                    $ctacte->origen = "OperacionesCheques";
+                    $ctacte->identificadorOrigen = $model->id;
 
-                    if(!$ctacteCliente->save()){
+                    if(!$ctacte->save()){
                         throw new Exception("Error al efectuar movimiento en ctacte del cliente", 1);                        
                     }
 
