@@ -109,7 +109,7 @@ class FinancierasController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create', 'update', 'admin', 'delete', 'validarProducto','buscarNombre'),
+				'actions'=>array('create', 'update', 'admin', 'delete', 'validarProducto','buscarNombre', 'getSaldos'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -414,6 +414,24 @@ class FinancierasController extends Controller
                 Yii::app()->end();
             } else {
                 echo "La consulta no devolvio resultados";
+            }
+        }
+    }
+
+    public function actionGetSaldos() {
+        if (isset($_POST['id'])) {
+			
+            $financiera = $this->loadModel($_POST['id']);
+			$financiera->productosId = $_POST['productoId'];
+
+            if ($financiera != null) {
+                $datos=array(
+                    "saldo"=>!empty($financiera->saldo) ? $financiera->saldo : 0,
+                    "saldoColocaciones"=>!empty($financiera->saldoColocaciones) ? $financiera->saldoColocaciones : 0,
+                    "montoPermitidoDescubierto"=>!empty($financiera->montoPermitidoDescubierto) ? $financiera->montoPermitidoDescubierto : 0
+                   );
+                echo CJSON::encode($datos);
+                //echo $financiera->saldo . ';' . $financiera->saldoColocaciones;
             }
         }
     }

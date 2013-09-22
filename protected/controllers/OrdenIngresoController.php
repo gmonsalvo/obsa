@@ -250,7 +250,7 @@ class OrdenIngresoController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update','createF'),
+				'actions'=>array('create','update','createFinanciera'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -413,7 +413,7 @@ class OrdenIngresoController extends Controller
 	/*
 	* Creación de Ordenes de Ingreso para Financieras.
 	*/
-	public function actionCreateF()
+	public function actionCreateFinanciera()
 	{
 		$model=new OrdenIngreso;
 
@@ -437,13 +437,13 @@ class OrdenIngresoController extends Controller
 			if($model->save())
 			    Yii::app()->user->setFlash('success','Ingreso de Fondos realizado con exito');
 				$model->unsetAttributes();
-				$this->redirect('createF',array(
+				$this->redirect('createFinanciera',array(
 					'model'=>$model,
 					));
 
 		}
 
-		$this->render('createF',array(
+		$this->render('createFinanciera',array(
 			'model'=>$model,
 		));
 	}
