@@ -140,8 +140,14 @@ class OrdenIngresoController extends Controller
 
         $html = 'Fecha: ' . $model->fecha . '
                        <br/>
-                       <br/>
-                       Cliente: ' . $model->productoCtaCte->cliente->razonSocial . '
+                       <br/>';
+		if ($model->productoCtaCte->nombreModelo=='Clientes') {
+			$html = $html . 'Cliente: ' . $model->productoCtaCte->cliente->razonSocial ;
+		} else {
+			$html = $html . 'Financiera: ' . $model->productoCtaCte->financiera->nombre ;
+		}                   
+                       
+        $html = $html .'
                        <br/>
                        <br/>
                        Orden de Ingreso Nro: ' . $model->id . '

@@ -428,10 +428,8 @@ class FinancierasController extends Controller
                 $datos=array(
                     "saldo"=>!empty($financiera->saldo) ? $financiera->saldo : 0,
                     "saldoColocaciones"=>!empty($financiera->saldoColocaciones) ? $financiera->saldoColocaciones : 0,
-                    "montoPermitidoDescubierto"=>!empty($financiera->montoPermitidoDescubierto) ? $financiera->montoPermitidoDescubierto : 0
                    );
                 echo CJSON::encode($datos);
-                //echo $financiera->saldo . ';' . $financiera->saldoColocaciones;
             }
         }
     }

@@ -76,7 +76,7 @@ $this->menu = array(
         'id' => 'ordenes-pago-form',
         'enableAjaxValidation' => false,
         'method' => 'post',
-        'action' => Yii::app()->createUrl("/ordenesPago/retirarFondos"),
+        'action' => Yii::app()->createUrl("/ordenesPago/retirarFondosFinanciera"),
         'htmlOptions' => array('onSubmit' => 'return validate(this)')
             ));
     ?>
@@ -143,10 +143,10 @@ $this->menu = array(
             ),
             'onSelectScript'=>CHtml::ajax(array('type'=>'POST', 'url'=>array("ordenesPago/cargarProductosFinanciera"), 'update'=>'#OrdenesPago_productoId')),
         ));
-        echo $form->error($model, 'clienteId');
+        echo $form->error($model, 'financieraId');
         echo CHtml::ajaxButton('Mostrar informacion', CHtml::normalizeUrl(array('financieras/getSaldos', 'render' => false)), array(
             'type' => 'POST',
-            'data' => array('id' => 'js:$("#OrdenesPago_clienteId").val()',
+            'data' => array('id' => 'js:$("#OrdenesPago_financieraId").val()',
             ),
             'dataType' => 'text',
             'beforeSend' => 'js:function(){
@@ -164,9 +164,6 @@ $this->menu = array(
                                 var datos=jQuery.parseJSON(data);
                                 $(".oculto").css("display","block");
                                 $("#saldoCtaCte").val(datos.saldo);
-                                $("#saldoColocaciones").val(datos.saldoColocaciones);
-                                $("#montoPermitidoDescubierto").val(datos.montoPermitidoDescubierto);
-
                                 $("#botonSubmit").removeAttr("disabled");
                             }
              }',
@@ -194,10 +191,6 @@ $this->menu = array(
     <div class="row oculto">
         <?php echo CHtml::label('Saldo en colocaciones', 'saldoColocaciones'); ?>
         <?php echo CHtml::textField('saldoColocaciones', 0, array('id' => 'saldoColocaciones', 'size' => 15, 'maxlength' => 15, 'readonly' => 'readonly')); ?>
-    </div>
-   <div class="row oculto">
-        <?php echo CHtml::label('Monto Permitido Descubierto', 'montoPermitidoDescubierto'); ?>
-        <?php echo CHtml::textField('montoPermitidoDescubierto', 0, array('id' => 'montoPermitidoDescubierto', 'size' => 15, 'maxlength' => 15, 'readonly' => 'readonly')); ?>
     </div>
 
     <div class="row">

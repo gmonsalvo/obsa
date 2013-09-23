@@ -24,6 +24,10 @@ class Financieras extends CActiveRecord
 	public $responsablesBusqueda;
 	public $productosBusqueda;
 	public $productosId;
+
+	private $saldo;
+    private $saldoColocaciones;
+    private $montoColocaciones;
 	
 	////// Métodos nuevos
 	
@@ -170,4 +174,56 @@ class Financieras extends CActiveRecord
 			'sort'=>array('attributes'=>array('productosBusqueda'=>array('asc'=>'productos.nombre', 'desc'=>'productos.nombre', ), '*', ), ),
 		));
 	}
+
+	public function getSaldo() {
+
+			$productoCliente = Productoctacte::model()->find("pkModeloRelacionado=:financieraId AND productoId=:productoId AND nombreModelo=:nombreModelo", 
+								array(":financieraId" => $this->id, ":productoId" => $this->productosId, ":nombreModelo" => "Financieras"));
+			
+			if (!$productoCliente)
+				return false;
+
+           $ctaCte=new Ctacte();
+		   $ctaCte->productoCtaCteId=$productoCliente->id;
+           //$ctaCte->clienteId=$this->id;
+		   //$ctaCte->productoId=0;
+           $this->saldo=$ctaCte->getSaldoAcumuladoActual();
+		   
+        // $creditoSQL = "SELECT SUM(monto) FROM ctacteClientes WHERE clienteId='" . $this->id . "' AND tipoMov=0 AND productoId=1 AND sucursalId=" . Yii::app()->user->model->sucursalId;
+        // $creditoQRY = Yii::app()->db->createCommand($creditoSQL)->queryScalar();
+        // $debitoSQL = "SELECT SUM(monto) FROM ctacteClientes WHERE clienteId='" . $this->id . "' AND tipoMov=1 AND productoId=1 AND sucursalId=" . Yii::app()->user->model->sucursalId;
+        // $debitoQRY = Yii::app()->db->createCommand($debitoSQL)->queryScalar();
+        // $this->saldo = $creditoQRY - $debitoQRY;
+        return $this->saldo;
+    }
+
+    public function setSaldo($saldo){
+        $this->saldo=$saldo;
+    }
+
+    public function getSaldoColocaciones() {
+
+        $sql = "SELECT detalleColocaciones.*,cheques.fechaPago, cheques.clearing 
+        		FROM detalleColocaciones, colocaciones, cheques 
+        		WHERE detalleColocaciones.clienteId='" . $this->id . 
+        		"' AND colocaciones.estado='" . Colocaciones::ESTADO_ACTIVA . 
+        		"' AND colocaciones.id=detalleColocaciones.colocacionId " . 
+        		" AND cheques.id=colocaciones.chequeId AND cheques.estado='" . Cheques::TYPE_EN_CARTERA_COLOCADO . "'";
+        $detalleColocaciones = Yii::app()->db->createCommand($sql)->queryAll($sql);
+        if (count($detalleColocaciones) > 0) {
+            $this->saldoColocaciones = 0;
+            for ($i = 0; $i < count($detalleColocaciones); $i++){
+                $colocacion = Colocaciones::model()->findByPk($detalleColocaciones[$i]["colocacionId"]);
+
+                $this->saldoColocaciones+=$colocacion->calculoValorActual($detalleColocaciones[$i]['monto'], Utilities::ViewDateFormat($colocacion->cheque->fechaPago), $detalleColocaciones[$i]['tasa'], $colocacion->getClearing());
+            }
+        }
+
+        return $this->saldoColocaciones;
+    }
+
+    public function setSaldoColocaciones($saldoColocaciones){
+        $this->saldoColocaciones=$saldoColocaciones;
+    }
+
 }
