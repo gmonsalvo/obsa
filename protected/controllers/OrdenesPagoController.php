@@ -15,6 +15,16 @@ class OrdenesPagoController extends Controller {
 		
 		echo '<script> MostrarInformacion(); </script>';
 	}
+
+    public function actionCargarProductosFinanciera() {
+        
+        $financiera = Financieras::model()->findByPk($_POST['OrdenesPago']['financieraId']); //buscarProductosCliente($_POST['OrdenIngreso']['clienteId']);
+        
+        foreach($financiera->productos as $producto)
+            echo CHtml::tag('option', array('value'=>$producto->id),CHtml::encode($producto->nombre),true);
+        
+        echo '<script> MostrarInformacion(); </script>';
+    }
 	
 	///// Métodos Generados
 
@@ -45,7 +55,9 @@ class OrdenesPagoController extends Controller {
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions' => array('create', 'update', 'admin', 'getDetalles', 'updateOrden', 'reciboPDF', 'retirarFondos', 'final', 'cargarProductosCliente'),
+                'actions' => array('create', 'update', 'admin', 'getDetalles', 'updateOrden', 
+                                'reciboPDF', 'retirarFondos', 'final', 'cargarProductosCliente', 
+                                'retirarFondosFinanciera', 'cargarProductosFinanciera'),
                 'users' => array('@'),
             ),
             array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -457,10 +469,15 @@ class OrdenesPagoController extends Controller {
                     } else {
                         if ($ordenesPago->origenOperacion == OrdenesPago::ORIGEN_OPERACION_RETIRO_FONDOS) {
                             //
-                            $productoCliente = Productoctacte::model()->find("pkModeloRelacionado=:clienteId AND productoId=:productoId AND nombreModelo=:nombreModelo", array(":clienteId" => $ordenesPago->clienteId, ":productoId" => $ordenesPago->productoId, ":nombreModelo" => "Clientes"));
+                            /*
+                            $productoCliente = Productoctacte::model()->find("pkModeloRelacionado=:clienteId AND productoId=:productoId AND nombreModelo=:nombreModelo", 
+                                                array(":clienteId" => $ordenesPago->clienteId, 
+                                                    ":productoId" => $ordenesPago->productoId, ":nombreModelo" => "Clientes"));
+                            */
+                            $productoCliente = $ordenesPago->productoCtaCte;
 						
 							if (!$productoCliente)
-								throw new Exception("Error al obtener la relación producto-cliente", 1);
+								throw new Exception("Error al obtener la relación producto-cliente  ". $ordenesPago->clienteId . " - ". $ordenesPago->productoId, 1);
                             
                             $flujoFondos = new FlujoFondos;
                             $flujoFondos->cuentaId = '6'; // corresponde a la caja de operaciones
@@ -524,14 +541,25 @@ class OrdenesPagoController extends Controller {
                             $command->bindValue(":saldoAcumulado", $saldoAcumulado, PDO::PARAM_STR);
                             if(!$command->execute())
                                 throw new Exception("Error", 1);
+                            
                             $ordenesPago->estado=OrdenesPago::ESTADO_PAGADA;
-                            $ordenesPago->save();
-                            Yii::app()->user->setFlash('success', 'Movimiento realizado con exito');
-                            $ejecutar = '<script type="text/javascript" language="javascript">
-                            window.open("'.Yii::app()->createUrl("/ordenesPago/reciboPDF", array("id"=>$id)).'");
-                            </script>';
+                            if ($ordenesPago->save()) {
+                                Yii::app()->user->setFlash('success', 'Movimiento realizado con exito');
+                                $ejecutar = '<script type="text/javascript" language="javascript">
+                                    window.open("'.Yii::app()->createUrl("/ordenesPago/reciboPDF", array("id"=>$id)).'");
+                                </script>';
 
-                            Yii::app()->session['ejecutar'] = $ejecutar;
+                                Yii::app()->session['ejecutar'] = $ejecutar;
+                            } else {
+                                
+                                //Yii::app()->user->setFlash('success', 'ERRRORR' .var_dump(  $ordenesPago->getErrors() ) );
+                                print_r($ordenesPago->getErrors());
+                                $transaction->rollback();
+                                //$this->redirect(array('admin'));
+                                return ;
+                            }                     
+                            
+                            
                         }
                     }
 
@@ -611,7 +639,7 @@ class OrdenesPagoController extends Controller {
         $html = 'Fecha: ' . Utilities::ViewDateFormat($model->fecha) . '
                        <br/>
                        <br/>
-                       Cliente: ' . $model->cliente->razonSocial . '
+                       Cliente: ' . $model->productoCtaCte->cliente->razonSocial . '
                        <br/>
                        <br/>
                        Orden de Pago Nro: ' . $model->id . '
@@ -704,6 +732,56 @@ class OrdenesPagoController extends Controller {
         Yii::app()->user->setFlash('success', 'Orden de Pago Procesada con exito');
         $model->unsetAttributes();
         $this->redirect(array('admin'));
+    }
+
+    public function actionRetirarFondosFinanciera() {
+
+        $model = new OrdenesPago;
+
+        // Uncomment the following line if AJAX validation is needed
+        // $this->performAjaxValidation($model);
+
+        if (isset($_POST['OrdenesPago'])) {
+            $model->attributes = $_POST['OrdenesPago'];
+            $model->estado = OrdenesPago::ESTADO_PENDIENTE;
+            $model->origenOperacion = OrdenesPago::ORIGEN_OPERACION_RETIRO_FONDOS;
+            $model->descripcion = "RETIRO: ".$model->descripcion;
+
+            $productoCtaCte = Productoctacte::model()->find("pkModeloRelacionado=:financieraId AND productoId=:productoId AND nombreModelo=:nombreModelo", 
+                    array(":financieraId" => $_POST['OrdenesPago']['financieraId'], 
+                    ":productoId" => $_POST['OrdenesPago']['productoId'], ":nombreModelo" => "Financieras"));
+            if (!isset($productoCtaCte))
+                return false;
+
+            $model->productoCtaCteId = $productoCtaCte->id;
+            //$model->monedaId = 2; //pesos
+            //$model->tasaCambio = Monedas::model()->findByPk($model->monedaId)->tasaCambioVenta;
+            $model->fecha = Utilities::MysqlDateFormat($model->fecha);
+            $connection = Yii::app()->db;
+            $transaction = $connection->beginTransaction();
+
+            try {
+                if ($model->save()) {
+                    $sql = "INSERT INTO formaPagoOrden (ordenPagoId, monto, tipoFormaPago, formaPagoId) values (:ordenPagoId, :monto, :tipoFormaPago, :formaPagoId)";
+                    $command = $connection->createCommand($sql);
+                    $command->bindValue(":ordenPagoId", $model->id, PDO::PARAM_STR);
+                    $command->bindValue(":monto", $model->monto, PDO::PARAM_STR);
+                    $command->bindValue(":tipoFormaPago", FormaPagoOrden::TIPO_EFECTIVO, PDO::PARAM_STR);
+                    $command->bindValue(":formaPagoId", 0, PDO::PARAM_STR);
+                    $command->execute();
+
+                    $transaction->commit();
+                    Yii::app()->user->setFlash('success', 'El retiro de fondos fue creado con exito');
+                    $model = new OrdenesPago;
+                }
+            } catch (Exception $e) {
+                $transaction->rollback();
+            }
+        }
+        $model->unsetAttributes();
+        $this->render('retiroFondosFinanciera', array(
+            'model' => $model, 'Financieras' => new Financieras()
+        ));
     }
 
 }

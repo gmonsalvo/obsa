@@ -31,6 +31,8 @@ class OrdenesPago extends CustomCActiveRecord {
     public $cliente;
     public $clienteId;
     public $productoId;
+    public $financieraId;
+    public $financiera;
 	
     /**
      * Returns the static model of the specified AR class.
@@ -63,8 +65,8 @@ class OrdenesPago extends CustomCActiveRecord {
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array('clienteId, productoId, fecha, monto, estado, sucursalId', 'required'),
-            array('clienteId, productoId, estado, sucursalId', 'numerical', 'integerOnly' => true),
+            array('fecha, monto, estado, sucursalId', 'required'),
+            array('estado, sucursalId', 'numerical', 'integerOnly' => true),
             array('porcentajePesificacion', 'length', 'max' => 7),
             array('monto', 'length', 'max' => 15),
             array('descripcion', 'length', 'max' => 100),
@@ -72,7 +74,7 @@ class OrdenesPago extends CustomCActiveRecord {
             array('timeStamp', 'safe'),
             // The following rule is used by search().
             // Please remove those attributes that should not be searched.
-            array('id, clienteId, productoId, fecha, monto, descripcion, estado, sucursalId, userStamp, timeStamp', 'safe', 'on' => 'search'),
+            array('id, fecha, monto, descripcion, estado, sucursalId, userStamp, timeStamp', 'safe', 'on' => 'search'),
         );
     }
 
