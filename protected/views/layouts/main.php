@@ -66,7 +66,7 @@
                                     array('label' => 'Adm. Financieras', 'url' => array('/financieras/admin')),
                                     array('label' => 'Depositos', 'url' => array('/ordenIngreso/createFinanciera')),
                                     array('label' => 'Retiros', 'url' => array('/ordenesPago/retirarFondosFinanciera')),
-                                    array('label' => 'Cuenta Corriente', 'url' => array('/ordenesPagoProveedores/create')),
+                                    array('label' => 'Cuenta Corriente', 'url' => array('/ctacte/adminFinancieras')),
                                     array('label' => 'Conciliacion Diaria', 'url' => array('/ordenesPagoProveedores/create')),
                                     array('label' => 'Acreditaciones de Inversiones', 'url' => array('/ordenesPagoProveedores/create')),
                                     array('label' => 'Envio/Recepcion Fisicos', 'url' => array('/ordenesPagoProveedores/create')),

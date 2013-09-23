@@ -55,7 +55,7 @@ class CtacteController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update','admin','delete','cargarProductosCliente','filtrar'),
+				'actions'=>array('create','update','admin','delete','cargarProductosCliente','filtrar', 'adminFinancieras'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -177,6 +177,38 @@ class CtacteController extends Controller
           }  
         
         $this->render('admin', array(
+            'model' => $model,
+        ));
+		
+		/*
+		$model=new Ctacte('search');
+		$model->unsetAttributes();  // clear any default values
+		if(isset($_GET['Ctacte']))
+			$model->attributes=$_GET['Ctacte'];
+
+		$this->render('admin',array(
+			'model'=>$model,
+		));
+		*/
+	}
+
+	public function actionAdminFinancieras()
+	{
+        $model = new Ctacte('search');
+        $model->unsetAttributes();  // clear any default values
+        if (isset($_GET['Ctacte'])){
+            $model->attributes = $_GET['Ctacte'];
+            if (isset($_GET['fechaInicio'])){
+                $model->fechaInicio=date('Y-m-d', CDateTimeParser::parse($_GET['fechaInicio'], 'dd/MM/yyyy'));
+                $model->fechaFin=date('Y-m-d', CDateTimeParser::parse($_GET['fechaFin'], 'dd/MM/yyyy'));
+            }else {
+                $model->fechaInicio=date('Y-m-d', CDateTimeParser::parse($model->fechaInicio, 'dd/MM/yyyy'));
+                $model->fechaFin=date('Y-m-d', CDateTimeParser::parse($model->fechaFin, 'dd/MM/yyyy'));
+            }
+
+          }  
+        
+        $this->render('adminFinancieras', array(
             'model' => $model,
         ));
 		
