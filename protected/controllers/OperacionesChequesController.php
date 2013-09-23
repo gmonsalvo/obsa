@@ -198,27 +198,33 @@ class OperacionesChequesController extends Controller {
                     }
                     //borro los registros temporales
                     $command->delete('tmpCheques', 'DATE(timeStamp)=:fechahoy AND userStamp=:username AND presupuesto=0', array(':fechahoy' => Date('Y-m-d'), ':username' => Yii::app()->user->model->username));
-                    
+                    /*
 					$transaction->rollBack();
 					print_r($_POST);
-					exit;
+					exit;*/
+					
+					$productoCtaCte = Productoctacte::model()->find("pkModeloRelacionado=:clienteId AND productoId=:productoId AND nombreModelo=:nombreModelo", 
+                    array(":clienteId" => $_POST['OperacionesCheques']['clienteId'], 
+                    ":productoId" => $_POST['OperacionesCheques']['productoId'], ":nombreModelo" => "Clientes"));
+		            if (!isset($productoCtaCte))
+		                throw new Exception("Error al obtener la información del cliente", 1); 
 					
                     $ctacte = new Ctacte();
                     $ctacte->tipoMov = Ctacte::TYPE_CREDITO;
                     $ctacte->conceptoId = 12;
-                    $ctacte->clienteId = $model->clienteId;
-                    $ctacte->productoId = 1;
+                    $ctacte->productoCtaCteId = $productoCtaCte->id;
                     $ctacte->descripcion = "Credito por la compra de cheques";
-
+					$ctacte->sucursalId = Yii::app()->user->model->sucursalId;
                     $ctacte->monto = $model->montoNetoTotal;
-                    $ctacte->saldoAcumulado=$ctacteCliente->getSaldoAcumuladoActual()+$ctacteCliente->monto;
+                    $ctacte->saldoAcumulado=$ctacte->getSaldoAcumuladoActual()+$ctacte->monto;
                     $ctacte->fecha = date("Y-m-d");
                     $ctacte->origen = "OperacionesCheques";
                     $ctacte->identificadorOrigen = $model->id;
-
-                    if(!$ctacte->save()){
+			        $ctacte->userStamp = Yii::app()->user->model->username;
+			        $ctacte->timeStamp = Date("Y-m-d h:m:s");
+					
+                    if(!$ctacte->save())
                         throw new Exception("Error al efectuar movimiento en ctacte del cliente", 1);                        
-                    }
 
                     $transaction->commit();
                     Yii::app()->user->setFlash('success', 'Movimiento realizado con exito');
