@@ -46,6 +46,7 @@ function exportar(){
 }
 </script>
 <br /><br />
+
 <?php echo CHtml::button("Exportar PDF",array("onclick"=>"exportar()"));?>
 <?php $this->widget('zii.widgets.grid.CGridView', array(
 	'id'=>'clientes-grid',

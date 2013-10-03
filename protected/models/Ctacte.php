@@ -54,6 +54,23 @@ class Ctacte extends CActiveRecord
                 return 0;
         } else return 0;
     }
+	
+    public function getTotalPorConcepto($clienteId, $conceptoId) {
+    	
+		$nombreModelo = "Clientes";
+		
+        $criteria = new CDbCriteria();
+        $criteria->select = "SUM(t.monto) as total";
+		$criteria->join = "LEFT OUTER JOIN productoctacte on (productoctacte.id = t.productoCtaCteId) ";
+		$criteria->condition = "productoctacte.pkModeloRelacionado =:clienteId AND productoctacte.nombreModelo = :nombreModelo AND t.conceptoId=:conceptoId";
+        $criteria->params = array(
+            ':clienteId' => $clienteId,
+            ':conceptoId' => $conceptoId,
+			':nombreModelo' => $nombreModelo);
+        $ctacteClientes = Ctacte::model()->find($criteria);
+        return $ctacteClientes->total;
+    }
+	
 	/*
     public function searchByFechaAndCliente($fechaIni, $fechaFin, $productoCtaCteId) {
         $criteria = new CDbCriteria;
