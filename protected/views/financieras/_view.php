@@ -46,6 +46,21 @@
 		}
 	?>
 	
+	<b>
+		<?php echo CHtml::encode($data->getAttributeLabel('financieraEstrella')); ?>:</b>
+		<?php
+			$valorCadena = 'No';
+			if ($data->financieraEstrella == 1)
+				$valorCadena = 'Si';
+			echo CHtml::encode($valorCadena); 
+		?>
+	<br />
+	
+	<b><?php echo CHtml::encode($data->getAttributeLabel('porcentajeInversion')); ?>:</b>
+	<?php echo CHtml::encode($data->porcentajeInversion).'%'; ?>
+	<br />
+	
+	
 	<?php /*
 	<b><?php echo CHtml::encode($data->getAttributeLabel('userStamp')); ?>:</b>
 	<?php echo CHtml::encode($data->userStamp); ?>

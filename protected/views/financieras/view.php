@@ -35,5 +35,15 @@ $this->menu=array(
 	       'type'=>'raw',
 	       'value'=>$this->dibujarCeldaProductosLista($model),
         ),
+		array(
+	       'label'=>'Financiera Estrella',
+	       'type'=>'raw',
+	       'value'=>($model->financieraEstrella == 1)?'Si':'No',
+        ),
+		array(
+	       'label'=>'Porcentaje Inversion',
+	       'type'=>'raw',
+	       'value'=>$model->porcentajeInversion.'%',
+        ),
 	),
 )); ?>
