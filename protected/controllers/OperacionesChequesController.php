@@ -27,6 +27,14 @@ class OperacionesChequesController extends Controller {
 		echo "$('#productoId').val('".$i."');";
 		echo "</script>";
 	}
+
+    public function actionCargarProductosFinanciera() {
+        
+        $cliente = Financieras::model()->findByPk($_POST['OperacionesCheques']['pkModeloRelacionado']); //buscarProductosCliente($_POST['OrdenIngreso']['clienteId']);
+        
+        foreach($cliente->productos as $producto)
+            echo CHtml::tag('option', array('value'=>$producto->id),CHtml::encode($producto->nombre),true);
+    }
 		
 	////// Métodos Generados
 
@@ -57,7 +65,9 @@ class OperacionesChequesController extends Controller {
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions' => array('create', 'update', 'admin', 'nuevaOperacion', 'generatePDF', 'ResumenPDF','imprimirPDF','anularOperacion', 'cargarProductosCliente'),
+                'actions' => array('create', 'update', 'admin', 'nuevaOperacion', 'generatePDF', 'ResumenPDF',
+                                'imprimirPDF','anularOperacion', 'cargarProductosCliente', 
+                                'comprarYColocar', 'cargarProductosFinanciera'),
                 'users' => array('@'),
             ),
             array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -462,6 +472,142 @@ class OperacionesChequesController extends Controller {
             }
         }
         $this->redirect(array('admin'));
+    }
+
+    public function actionComprarYColocar() {
+        $model = new OperacionesCheques;
+        $tmpcheque = new TmpCheques;
+        // Uncomment the following line if AJAX validation is needed
+        // $this->performAjaxValidation($model);
+        if (isset($_POST['OperacionesCheques'])) {
+            $model->attributes = $_POST['OperacionesCheques'];
+            $model->estado = OperacionesCheques::ESTADO_A_PAGAR;
+            $model->montoNetoTotal = Utilities::Unformat($model->montoNetoTotal);
+            $model->fecha = Utilities::MysqlDateFormat($model->fecha);
+            $connection = Yii::app()->db;
+            $command = Yii::app()->db->createCommand();
+            $tmpcheques = $command->select('*')->from('tmpCheques')->where('DATE(timeStamp)=:fechahoy AND userStamp=:username AND presupuesto=0', array(':fechahoy' => Date('Y-m-d'), ':username' => Yii::app()->user->model->username))->queryAll();
+            $transaction = $connection->beginTransaction();
+            try {
+                if ($model->save() && count($tmpcheques) > 0) { //si valida OperacionCheque y ademas cargo algun TmpCheque
+                    $operacionChequeId = $model->id;
+                    $tasaPromedioPesificacion=Yii::app()->user->model->sucursal->tasaPromedioPesificacion;
+                    foreach ($tmpcheques as $tcheque) {
+                        $cheque = new Cheques();
+                        $cheque->operacionChequeId = $operacionChequeId;
+                        $cheque->tasaDescuento = $tcheque['tasaDescuento'];
+                        $cheque->clearing = $tcheque['clearing'];
+                        $cheque->pesificacion = $tcheque['pesificacion'];
+                        $cheque->numeroCheque = $tcheque['numeroCheque'];
+                        $cheque->libradorId = $tcheque['libradorId'];
+                        $cheque->bancoId = $tcheque['bancoId'];
+                        $cheque->montoOrigen = $tcheque['montoOrigen'];
+                        $cheque->fechaPago = $tcheque['fechaPago'];
+                        $cheque->tipoCheque = $tcheque['tipoCheque'];
+                        $cheque->endosante = $tcheque['endosante'];
+                        $cheque->montoNeto = $tcheque['montoNeto'];
+                        $cheque->estado = $tcheque['estado'];
+                        $cheque->tieneNota = $tcheque['tieneNota'];
+                        if (!$cheque->save()) {
+                            $transaction->rollBack();
+                            Yii::app()->user->setFlash('error', var_dump($cheque->getErrors()));
+                            $this->render('crear', array(
+                                'model' => $model, 'tmpcheque' => $tmpcheque
+                            ));
+                        }
+
+                         ##Acredito la prevision por la pesificacion usando la tasa promedio
+                    
+                        $previsionPesificacion = $cheque->montoOrigen*$tasaPromedioPesificacion/100;
+                        $gastoPesificacion = $cheque->montoOrigen*$cheque->pesificacion/100;
+                        $diferenciaPesificacion = $gastoPesificacion - $previsionPesificacion;
+
+                        $flujoFondos = new FlujoFondos;
+                        $flujoFondos->cuentaId = '11'; // fondo de inversores
+                        $flujoFondos->conceptoId = 24; // credito en fondo inversores
+                        $flujoFondos->descripcion = "Prevision de pesificacion para cheque nro. ".$cheque->numeroCheque;
+                        $flujoFondos->tipoFlujoFondos = FlujoFondos::TYPE_CREDITO;
+
+                        $flujoFondos->monto = $previsionPesificacion;
+                        $flujoFondos->saldoAcumulado = $flujoFondos->getSaldoAcumuladoActual() + $flujoFondos->monto; //tipo mov es credito
+                        $flujoFondos->fecha = Date("d/m/Y");
+                        $flujoFondos->origen = 'Cheques';
+                        $flujoFondos->identificadorOrigen = $cheque->id;
+                        $flujoFondos->sucursalId = Yii::app()->user->model->sucursalId;
+                        $flujoFondos->userStamp = Yii::app()->user->model->username;
+                        $flujoFondos->timeStamp = Date("Y-m-d h:m:s");
+                        $flujoFondos->save();
+                        if(!$flujoFondos->save()) {
+                            throw new Exception("Error al efectuar movimiento en fondo de inversores", 1); 
+                        }
+
+                        $flujoFondos = new FlujoFondos;
+                        $flujoFondos->cuentaId = '12'; // diferencia pesificaciones
+                        $flujoFondos->conceptoId = 18; 
+                        $flujoFondos->descripcion = "Diferencia de la pesificacion por la compra del cheque nro. ".$cheque->numeroCheque;
+                        $flujoFondos->tipoFlujoFondos = FlujoFondos::TYPE_CREDITO;
+
+                        $flujoFondos->monto = $diferenciaPesificacion;
+                        $flujoFondos->saldoAcumulado = $flujoFondos->getSaldoAcumuladoActual() + $flujoFondos->monto; //tipo mov es credito
+                        $flujoFondos->fecha = Date("d/m/Y");
+                        $flujoFondos->origen = 'Cheques';
+                        $flujoFondos->identificadorOrigen = $cheque->id;
+                        $flujoFondos->sucursalId = Yii::app()->user->model->sucursalId;
+                        $flujoFondos->userStamp = Yii::app()->user->model->username;
+                        $flujoFondos->timeStamp = Date("Y-m-d h:m:s");
+                        $flujoFondos->save();
+                        if(!$flujoFondos->save()) {
+                            throw new Exception("Error al efectuar movimiento en fondo de inversores", 1); 
+                        }
+                    }
+                    //borro los registros temporales
+                    $command->delete('tmpCheques', 'DATE(timeStamp)=:fechahoy AND userStamp=:username AND presupuesto=0', array(':fechahoy' => Date('Y-m-d'), ':username' => Yii::app()->user->model->username));
+                    /*
+                    $transaction->rollBack();
+                    print_r($_POST);
+                    exit;*/
+                    
+                    $productoCtaCte = Productoctacte::model()->find("pkModeloRelacionado=:clienteId AND productoId=:productoId AND nombreModelo=:nombreModelo", 
+                    array(":clienteId" => $_POST['OperacionesCheques']['clienteId'], 
+                    ":productoId" => $_POST['OperacionesCheques']['productoId'], ":nombreModelo" => "Clientes"));
+                    if (!isset($productoCtaCte))
+                        throw new Exception("Error al obtener la información del cliente", 1); 
+                    
+                    $ctacte = new Ctacte();
+                    $ctacte->tipoMov = Ctacte::TYPE_CREDITO;
+                    $ctacte->conceptoId = 12;
+                    $ctacte->productoCtaCteId = $productoCtaCte->id;
+                    $ctacte->descripcion = "Credito por la compra de cheques";
+                    $ctacte->sucursalId = Yii::app()->user->model->sucursalId;
+                    $ctacte->monto = $model->montoNetoTotal;
+                    $ctacte->saldoAcumulado=$ctacte->getSaldoAcumuladoActual()+$ctacte->monto;
+                    $ctacte->fecha = date("Y-m-d");
+                    $ctacte->origen = "OperacionesCheques";
+                    $ctacte->identificadorOrigen = $model->id;
+                    $ctacte->userStamp = Yii::app()->user->model->username;
+                    $ctacte->timeStamp = Date("Y-m-d h:m:s");
+                    
+                    if(!$ctacte->save())
+                        throw new Exception("Error al efectuar movimiento en ctacte del cliente", 1);                        
+
+                    $transaction->commit();
+                    Yii::app()->user->setFlash('success', 'Movimiento realizado con exito');
+                    $this->redirect(array('view', 'id' => $model->id));
+                } else {
+                    if (count($tmpcheques) == 0) {
+                        $tmpcheque->addError('error', 'Debe ingresar al menos un cheque para cerrar la Operacion');
+                        $transaction->rollBack();
+                    }
+                }
+            } catch (Exception $e) { // an exception is raised if a query fails
+                $transaction->rollBack();
+                Yii::app()->user->setFlash('error', $e->getMessage());
+            }
+        }
+        $model->init();
+        $this->render('comprarYColocar', array(
+            'model' => $model, 'tmpcheque' => $tmpcheque
+        ));
     }
 
 }
