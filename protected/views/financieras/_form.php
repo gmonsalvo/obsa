@@ -149,6 +149,18 @@
 		</div>
 	</div>	
 
+	<div class="row">
+		<?php echo $form->labelEx($model,'porcentajeInversion'); ?>
+		<?php echo $form->textField($model,'porcentajeInversion',array('size'=>6,'maxlength'=>6)); ?>
+		<?php echo $form->error($model,'porcentajeInversion'); ?>
+	</div>
+
+	<div class="row">
+        <?php echo $form->labelEx($model,'financieraEstrella'); ?>
+        <?php echo $form->checkBox($model,'financieraEstrella'); ?>
+        <?php echo $form->error($model,'financieraEstrella'); ?>
+    </div>
+
 	<div class="row buttons">
 		<?php echo CHtml::submitButton($model->isNewRecord ? 'Guardar' : 'Guardar Cambios', array('id'=>'botonEnviar')); ?>
 	</div>

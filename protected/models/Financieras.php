@@ -11,6 +11,8 @@
  * @property string $tasaPromedio
  * @property integer $diasClearing
  * @property string $tasaPesificacion
+ * @property string $finacieraEstrella
+ * @property string $porcentajeInversion
  * @property string $userStamp
  * @property string $timeStamp
  *
@@ -24,6 +26,8 @@ class Financieras extends CActiveRecord
 	public $responsablesBusqueda;
 	public $productosBusqueda;
 	public $productosId;
+	public $financieraEstrellaBusqueda;
+	public $porcentajeInversionBusqueda;
 
 	private $saldo;
     private $saldoColocaciones;
@@ -95,13 +99,14 @@ class Financieras extends CActiveRecord
 			array('nombre', 'length', 'max'=>100),
 			array('direccion, telefono, userStamp', 'length', 'max'=>45),
 			array('tasaPromedio, tasaPesificacion', 'length', 'max'=>5),
-			array('tasaPromedio, tasaPesificacion', 'numerical', 'integerOnly'=>false),
+			array('porcentajeInversion', 'length', 'max'=>6),
+			array('porcentajeInversion', 'numerical', 'integerOnly'=>false, 'min'=>0.00, 'max'=>100.00),
 			array('tasaPromedio, tasaPesificacion', 'numerical', 'integerOnly'=>false),
 			array('responsables', 'validarResponsables', 'message'=>'Debe especificar al menos dos responsables para la financiera'),
 			array('productos', 'validarProductos', 'message'=>'Debe seleccionar al menos un producto para la financiera'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, nombre, direccion, telefono, tasaPromedio, diasClearing, tasaPesificacion, responsablesBusqueda, productosBusqueda, userStamp, timeStamp', 'safe', 'on'=>'search'),
+			array('id, nombre, direccion, telefono, tasaPromedio, diasClearing, tasaPesificacion, responsablesBusqueda, productosBusqueda, financieraEstrellaBusqueda, porcentajeInversionBusqueda, userStamp, timeStamp', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -134,6 +139,8 @@ class Financieras extends CActiveRecord
 			'diasClearing' => 'Dias Clearing',
 			'tasaPesificacion' => 'Tasa Pesificacion',
 			'financieras' => 'Financieras',
+			'financieraEstrella' => 'Financiera Estrella',
+			'porcentajeInversion' => 'Porcentaje de Inversion',
 			'userStamp' => 'User Stamp',
 			'timeStamp' => 'Time Stamp',
 		);
@@ -157,6 +164,8 @@ class Financieras extends CActiveRecord
 		$criteria->compare('tasaPromedio',$this->tasaPromedio,true);
 		$criteria->compare('diasClearing',$this->diasClearing);
 		$criteria->compare('tasaPesificacion',$this->tasaPesificacion,true);
+		$criteria->compare('CASE WHEN t.financieraEstrella = 1 THEN \'Si\' ELSE \'No\' END',$this->financieraEstrellaBusqueda,true);
+		$criteria->compare('CONCAT(t.porcentajeInversion,\'%\')',$this->porcentajeInversionBusqueda,true);
 		$criteria->compare('userStamp',$this->userStamp,true);
 		$criteria->compare('timeStamp',$this->timeStamp,true);
 		$criteria->with = array('responsables', 'productos');

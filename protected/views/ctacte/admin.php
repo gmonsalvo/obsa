@@ -75,27 +75,3 @@ $this->widget('GridViewStyle', array(
     ));
 
 ?>
-
-
-<?php
-/*
-    
-    echo CHtml::ajaxButton('Filtrar',
-            //Yii::app()->createUrl("cheques/filtrar", array("prueba"=>'$("#fechaIni").val()',)),
-            CHtml::normalizeUrl(array('ctacteClientes/filtrar', 'render' => false)), array(
-        'type' => 'GET',
-        'data' => array(
-            'fechaIni' => 'js:$("#fechaIni").val()',
-            'fechaFin' => 'js:$("#fechaFin").val()',
-            'clienteId' => $model->clienteId
-        ),
-        'dataType' => 'text',
-        'success' => 'js:function(data){
-					$("#resultados").html(data);
-					}',
-    ))
-    */
-    ?>
-  
-
-

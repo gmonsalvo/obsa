@@ -240,8 +240,8 @@ class ClientesController extends Controller {
             }
         }
 
-        $totalDepositos = CtacteClientes::model()->getTotalPorConcepto($clienteId, 9);
-        $totalRetiros = CtacteClientes::model()->getTotalPorConcepto($clienteId, 16);
+        $totalDepositos = Ctacte::model()->getTotalPorConcepto($clienteId, 9);
+        $totalRetiros = Ctacte::model()->getTotalPorConcepto($clienteId, 16);
 
         $cliente = Clientes::model()->findByPk($clienteId);
         $interesesDevengados = $cliente->montoColocaciones - $cliente->saldoColocaciones;

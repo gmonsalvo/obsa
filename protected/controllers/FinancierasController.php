@@ -223,6 +223,11 @@ class FinancierasController extends Controller
 			
 			$model->attributes=$_POST['Financieras'];
 			
+			if (isset($_POST['Financieras']['financieraEstrella']))
+				$model->financieraEstrella = $_POST['Financieras']['financieraEstrella'];
+			else
+				$model->financieraEstrella = 0;
+			
 			if (isset($_POST['select_right'])) {
 	        	$vect = $_POST['select_right'];
 	        	foreach ($vect as $responsableId) {

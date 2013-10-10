@@ -49,6 +49,14 @@
 		<?php echo $form->label($model,'productos'); ?>
 		<?php echo $form->textField($model,'productosBusqueda',array('size'=>45,'maxlength'=>45)); ?>
 	</div>
+	<div class="row">
+		<?php echo $form->label($model,'financieraEstrella'); ?>
+		<?php echo $form->textField($model,'financieraEstrellaBusqueda',array('size'=>2,'maxlength'=>2)); ?>
+	</div>
+	<div class="row">
+		<?php echo $form->label($model,'porcentajeInversion'); ?>
+		<?php echo $form->textField($model,'porcentajeInversionBusqueda',array('size'=>6,'maxlength'=>6)); ?>
+	</div>
 	<!--
 	<div class="row">
 		<?php echo $form->label($model,'userStamp'); ?>

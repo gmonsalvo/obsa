@@ -57,10 +57,18 @@ $('.search-form form').submit(function(){
 			'type'=>'raw',
 			'value'=>array($this, 'dibujarCeldaProductosGrilla'),
 		),
-		/*
-		'userStamp',
-		'timeStamp',
-		*/
+		array(
+			'header'=>'Financiera Estrella',
+			'name'=>'financieraEstrellaBusqueda',
+			'type'=>'raw',
+			'value'=>'($data->financieraEstrella == 1)?\'Si\':\'No\'',
+		),
+		array(
+			'header'=>'Porcentaje Inversion',
+			'name'=>'porcentajeInversionBusqueda',
+			'type'=>'raw',
+			'value'=>'$data->porcentajeInversion.\'%\'',
+		),
 		array(
 			'class'=>'CButtonColumn',
 		),

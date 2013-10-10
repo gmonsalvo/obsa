@@ -135,6 +135,18 @@ class OperacionesChequesController extends Controller {
             $tmpcheques = $command->select('*')->from('tmpCheques')->where('DATE(timeStamp)=:fechahoy AND userStamp=:username AND presupuesto=0', array(':fechahoy' => Date('Y-m-d'), ':username' => Yii::app()->user->model->username))->queryAll();
             $transaction = $connection->beginTransaction();
             try {
+            	
+				//print_r($_POST['OperacionesCheques']);
+				//exit;
+				
+				$productoCtaCte = Productoctacte::model()->find("pkModeloRelacionado=:clienteId AND productoId=:productoId AND nombreModelo=:nombreModelo", 
+                array(":clienteId" => $_POST['OperacionesCheques']['clienteId'], 
+                ":productoId" => $_POST['OperacionesCheques']['productoId'], ":nombreModelo" => "Clientes"));
+		        if (!isset($productoCtaCte))
+		            throw new Exception("Error al obtener la información del cliente", 1); 
+				
+				//$model->clienteId = $productoCtaCte->id;
+				
                 if ($model->save() && count($tmpcheques) > 0) { //si valida OperacionCheque y ademas cargo algun TmpCheque
                     $operacionChequeId = $model->id;
                     $tasaPromedioPesificacion=Yii::app()->user->model->sucursal->tasaPromedioPesificacion;
@@ -208,16 +220,6 @@ class OperacionesChequesController extends Controller {
                     }
                     //borro los registros temporales
                     $command->delete('tmpCheques', 'DATE(timeStamp)=:fechahoy AND userStamp=:username AND presupuesto=0', array(':fechahoy' => Date('Y-m-d'), ':username' => Yii::app()->user->model->username));
-                    /*
-					$transaction->rollBack();
-					print_r($_POST);
-					exit;*/
-					
-					$productoCtaCte = Productoctacte::model()->find("pkModeloRelacionado=:clienteId AND productoId=:productoId AND nombreModelo=:nombreModelo", 
-                    array(":clienteId" => $_POST['OperacionesCheques']['clienteId'], 
-                    ":productoId" => $_POST['OperacionesCheques']['productoId'], ":nombreModelo" => "Clientes"));
-		            if (!isset($productoCtaCte))
-		                throw new Exception("Error al obtener la información del cliente", 1); 
 					
                     $ctacte = new Ctacte();
                     $ctacte->tipoMov = Ctacte::TYPE_CREDITO;
