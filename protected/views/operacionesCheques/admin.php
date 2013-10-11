@@ -39,7 +39,7 @@ function reinstallDatePicker(id, data) {
 		array(
                 'name' => 'clienteId',
                 'header' => 'Cliente',
-                'value' => '$data->cliente->razonSocial',
+                'value' => '$data->productoCtaCte->cliente->razonSocial',
                 'filter'=>  CHtml::listData(Clientes::model()->findAll(array('order'=>'razonSocial')), 'id', 'razonSocial'),
         ),
 		array(

@@ -125,6 +125,7 @@ class OperacionesChequesController extends Controller {
         $tmpcheque = new TmpCheques;
         // Uncomment the following line if AJAX validation is needed
         // $this->performAjaxValidation($model);
+        
         if (isset($_POST['OperacionesCheques'])) {
             $model->attributes = $_POST['OperacionesCheques'];
             $model->estado = OperacionesCheques::ESTADO_A_PAGAR;
@@ -135,17 +136,13 @@ class OperacionesChequesController extends Controller {
             $tmpcheques = $command->select('*')->from('tmpCheques')->where('DATE(timeStamp)=:fechahoy AND userStamp=:username AND presupuesto=0', array(':fechahoy' => Date('Y-m-d'), ':username' => Yii::app()->user->model->username))->queryAll();
             $transaction = $connection->beginTransaction();
             try {
-            	
-				//print_r($_POST['OperacionesCheques']);
-				//exit;
-				
 				$productoCtaCte = Productoctacte::model()->find("pkModeloRelacionado=:clienteId AND productoId=:productoId AND nombreModelo=:nombreModelo", 
                 array(":clienteId" => $_POST['OperacionesCheques']['clienteId'], 
                 ":productoId" => $_POST['OperacionesCheques']['productoId'], ":nombreModelo" => "Clientes"));
 		        if (!isset($productoCtaCte))
 		            throw new Exception("Error al obtener la información del cliente", 1); 
 				
-				//$model->clienteId = $productoCtaCte->id;
+				$model->productoCtaCteId = $productoCtaCte->id;
 				
                 if ($model->save() && count($tmpcheques) > 0) { //si valida OperacionCheque y ademas cargo algun TmpCheque
                     $operacionChequeId = $model->id;
@@ -358,11 +355,11 @@ class OperacionesChequesController extends Controller {
 				Entre INTERNACIONAL BUSINESS ADVISORS S.A. (I.B.A), en adelante el COMPRADOR, representada en este caso por su Presidente, HERALDO JOSE IRIONDO,
 				DNI: 17.613.879, con domicilio en calle San Martin N 631, piso 5, dpto. C, de la ciudad de San Miguel de Tucuman, provincia de Tucuman; y:
 				<br/>
-				<b>NOMBRE:</b> ' . $model->cliente->razonSocial . '
+				<b>NOMBRE:</b> ' . $model->productoCtaCte->cliente->razonSocial . '
 				<br/>
-				<b>DNI:</b> ' . $model->cliente->documento . '
+				<b>DNI:</b> ' . $model->productoCtaCte->cliente->documento . '
 				<br/>
-				<b>DOMICILIO:</b> ' . $model->cliente->direccion . '
+				<b>DOMICILIO:</b> ' . $model->productoCtaCte->cliente->direccion . '
 				<br/>
 				<br/>
 				En adelante el VENDEDOR, acuerdan en celebrar el presente CONTRATO DE COMPRA de las siguientes especies:

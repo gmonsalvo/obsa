@@ -113,7 +113,7 @@ if (isset($_POST['operadorId']) && isset($_POST['clienteId']) && isset($_POST['f
                 dataType: 'text',
                 success:function(data){
                     var datos=jQuery.parseJSON(data);
-                    var cliente=datos.cliente;
+                    var cliente=datos.productoCtaCte.cliente;
                     if(cliente.tasaTomador!="")
                         $("#TmpCheques_tasaDescuento").val(cliente.tasaTomador);
                     if(cliente.tasaPesificacionTomador!="")

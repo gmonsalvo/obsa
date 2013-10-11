@@ -6,7 +6,7 @@
  * The followings are the available columns in table 'operacionesCheques':
  * @property integer $id
  * @property integer $operadorId
- * @property integer $clienteId
+ * @property integer $productoCtaCteId
  * @property string $montoNetoTotal
  * @property string $fecha
  * @property string $userStamp
@@ -31,7 +31,10 @@ class OperacionesCheques extends CustomCActiveRecord {
     private $montoIntereses=0;
     private $montoNominalTotal=0;
 	
+	public $cliente;
+	public $clienteId;
 	public $productoId;
+	
     /**
      * Returns the static model of the specified AR class.
      * @return OperacionesCheques the static model class
@@ -54,14 +57,14 @@ class OperacionesCheques extends CustomCActiveRecord {
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array('operadorId, clienteId, montoNetoTotal, fecha, userStamp, timeStamp, sucursalId', 'required'),
-            array('operadorId, clienteId, sucursalId', 'numerical', 'integerOnly' => true),
+            array('operadorId, productoCtaCteId, montoNetoTotal, fecha, userStamp, timeStamp, sucursalId', 'required'),
+            array('operadorId, productoCtaCteId, sucursalId', 'numerical', 'integerOnly' => true),
             array('montoNetoTotal', 'length', 'max' => 15),
             array('userStamp', 'length', 'max' => 45),
             array('timeStamp', 'default', 'value' => new CDbExpression('NOW()'), 'setOnEmpty' => false, 'on' => 'insert'),
             // The following rule is used by search().
             // Please remove those attributes that should not be searched.
-            array('id, operadorId, clienteId, montoNetoTotal, fecha, userStamp, timeStamp, sucursalId', 'safe', 'on' => 'search'),
+            array('id, operadorId, productoCtaCteId, montoNetoTotal, fecha, userStamp, timeStamp, sucursalId', 'safe', 'on' => 'search'),
         );
     }
 
@@ -73,7 +76,7 @@ class OperacionesCheques extends CustomCActiveRecord {
         // class name for the relations automatically generated below.
         return array(
             'cheques' => array(self::HAS_MANY, 'Cheques', 'operacionChequeId'),
-            'cliente' => array(self::BELONGS_TO, 'Clientes', 'clienteId'),
+            'productoCtaCte' => array(self::BELONGS_TO, 'Productoctacte', 'productoCtaCteId'),
             'sucursal' => array(self::BELONGS_TO, 'Sucursales', 'sucursalId'),
             'operador' => array(self::BELONGS_TO, 'Operadores', 'operadorId'),
             'operacionesChequeOrdenPago'=>array(self::HAS_MANY, 'OperacionesChequeOrdenPago','operacionChequeId'),
@@ -109,7 +112,7 @@ class OperacionesCheques extends CustomCActiveRecord {
 
         $criteria->compare('id', $this->id);
         $criteria->compare('operadorId', $this->operadorId);
-        $criteria->compare('clienteId', $this->clienteId);
+        $criteria->compare('productoCtaCteId', $this->productoCtaCteId);
         $criteria->compare('montoNetoTotal', $this->montoNetoTotal, true);
         $criteria->compare('fecha', isset($this->fecha) ? Utilities::MysqlDateFormat($this->fecha) : $this->fecha, true);
         $criteria->compare('userStamp', Yii::app()->user->model->username, true);
