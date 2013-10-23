@@ -111,7 +111,7 @@
                 );
                 ?>
             </td>
-            <td><?php echo CHtml::textField("cliente", $operacionCheque->cliente->razonSocial, array('readonly' => 'readonly')); ?></td>
+            <td><?php echo CHtml::textField("cliente", $operacionCheque->productoCtaCte->cliente->razonSocial, array('readonly' => 'readonly')); ?></td>
             <td colspan="2"><?php echo $form->textField($model, 'descripcion', array('size' => 60, 'maxlength' => 100, 'value' => 'Compra de cheques')); ?></td>
         </tr>
         <tr>
@@ -121,17 +121,17 @@
             <td><?php echo $form->labelEx($model, 'monto'); ?></td>
         </tr>
         <tr>
-            <td><?php echo $form->textField($model, 'porcentajePesificacion', array("value" => $operacionCheque->cliente->tasaPesificacionTomador)) ?></td>
+            <td><?php echo $form->textField($model, 'porcentajePesificacion', array("value" => $operacionCheque->productoCtaCte->cliente->tasaPesificacionTomador)) ?></td>
             <td><?php echo CHtml::textField('montoEfectivo', $operacionCheque->montoNetoTotal, array('id' => 'montoEfectivo', 'size' => 15, 'maxlength' => 15, 'onblur' => 'Recalcular();')); ?></td>
             <td><?php echo CHtml::textField('montoCheques', 0, array('id' => 'montoCheques', 'size' => 15, 'maxlength' => 15, 'readonly' => 'readonly')); ?></td>
             <td><?php echo $form->textField($model, 'monto', array('size' => 15, 'maxlength' => 15, 'value' => $operacionCheque->montoNetoTotal, 'readonly' => 'readonly')); ?></td>
         </tr>
     </table>
 
-<?php echo $form->hiddenField($model, 'clienteId', array('value' => $operacionCheque->clienteId)); ?>
+<?php echo $form->hiddenField($model, 'clienteId', array('value' => $operacionCheque->productoCtaCte->cliente->id)); ?>
 <?php echo CHtml::hiddenField('chequesSeleccionados', '', array('id' => 'chequesSeleccionados')); ?>
-<?php echo CHtml::hiddenField('clienteId', $operacionCheque->clienteId, array('id' => 'clienteId')); ?>
-<?php echo CHtml::hiddenField('operacionChequeId', $operacionCheque->id, array('id' => 'operacionChequeId')); ?>
+<?php echo CHtml::hiddenField('clienteId', $operacionCheque->productoCtaCte->cliente->id, array('id' => 'clienteId')); ?>
+<?php echo CHtml::hiddenField('operacionChequeId', $operacionCheque->productoCtaCte->cliente->id, array('id' => 'operacionChequeId')); ?>
 
 Fecha inicio:
 <?php
