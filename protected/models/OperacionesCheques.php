@@ -32,6 +32,11 @@ class OperacionesCheques extends CustomCActiveRecord {
     private $montoNominalTotal=0;
 	
 	public $productoId;
+    public $pkModeloRelacionado;
+    public $financiera;
+    public $clienteId;
+    public $financieraId;
+
     /**
      * Returns the static model of the specified AR class.
      * @return OperacionesCheques the static model class
@@ -73,7 +78,7 @@ class OperacionesCheques extends CustomCActiveRecord {
         // class name for the relations automatically generated below.
         return array(
             'cheques' => array(self::HAS_MANY, 'Cheques', 'operacionChequeId'),
-            'cliente' => array(self::BELONGS_TO, 'Clientes', 'clienteId'),
+            'productoCtaCte' => array(self::BELONGS_TO, 'Productoctacte', 'productoCtaCteId'),
             'sucursal' => array(self::BELONGS_TO, 'Sucursales', 'sucursalId'),
             'operador' => array(self::BELONGS_TO, 'Operadores', 'operadorId'),
             'operacionesChequeOrdenPago'=>array(self::HAS_MANY, 'OperacionesChequeOrdenPago','operacionChequeId'),
@@ -88,6 +93,7 @@ class OperacionesCheques extends CustomCActiveRecord {
             'id' => 'ID',
             'operadorId' => 'Operador',
             'clienteId' => 'Cliente',
+            'financieraId' => 'Financiera',
             'productoId' => 'Producto',
             'montoNetoTotal' => 'Monto Neto Total',
             'fecha' => 'Fecha',
